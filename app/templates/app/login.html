@@ -1,0 +1,59 @@
+{% extends "app/base.html" %}
+{% load static %}
+{% block content %}
+<div class="d-flex align-items-center justify-content-center min-vh-100 px-3" style="background: var(--bg);">
+  <div class="bg-white dark:bg-gray-800 p-5 p-md-6 rounded-3 shadow-lg w-100" style="max-width: 400px;">
+    <h2 class="text-center mb-4 text-dark dark:text-white fw-bold">Đăng nhập</h2>
+
+    <!-- Hiển thị lỗi nếu login sai -->
+    {% if form.errors %}
+      <div class="alert alert-danger text-center py-2">
+        ⚠️ Tên đăng nhập hoặc mật khẩu không đúng.
+      </div>
+    {% endif %}
+
+    <form method="post" class="mb-3">
+      {% csrf_token %}
+      <div class="mb-3">
+        <label class="form-label text-dark dark:text-white">Tên đăng nhập</label>
+        <input type="text" name="username" 
+               value="{{ request.POST.username|default:'' }}" 
+               class="form-control dark:bg-gray-700 dark:text-white" 
+               required autofocus>
+      </div>
+      <div class="mb-3">
+        <label class="form-label text-dark dark:text-white">Mật khẩu</label>
+        <input type="password" name="password" 
+               class="form-control dark:bg-gray-700 dark:text-white" 
+               required>
+      </div>
+      <button type="submit" class="btn btn-primary w-100">Đăng nhập</button>
+    </form>
+
+    <p class="text-center text-muted dark:text-gray-300 mb-0">
+      Chưa có tài khoản? 
+      <a href="{% url 'signup' %}" class="text-primary dark:text-info">Đăng ký</a>
+    </p>
+  </div>
+</div>
+
+<!-- Toast thông báo -->
+<div id="toast" class="toast-container position-fixed top-0 end-0 p-3">
+  <div class="toast align-items-center text-bg-danger border-0" role="alert">
+    <div class="d-flex">
+      <div class="toast-body">⚠️ Đăng nhập thất bại!</div>
+      <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+    </div>
+  </div>
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  {% if form.errors %}
+    const toastEl = document.querySelector("#toast .toast");
+    const toast = new bootstrap.Toast(toastEl);
+    toast.show();
+  {% endif %}
+});
+</script>
+{% endblock %}

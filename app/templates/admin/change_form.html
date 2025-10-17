@@ -1,0 +1,43 @@
+{% extends "admin/change_form.html" %}
+{% load i18n %}
+
+{% block after_field_sets %}
+  {{ block.super }}
+
+  {% if original and original.orderitem_set.exists %}
+    <h2 style="margin-top:30px;">🛒 Danh sách sản phẩm đã đặt</h2>
+    <table border="1" cellpadding="6" cellspacing="0" style="border-collapse: collapse; width: 100%; font-size:14px;">
+      <thead style="background:#f5f5f5;">
+        <tr>
+          <th>Sản phẩm</th>
+          <th>Số lượng</th>
+          <th>Giá</th>
+          <th>Thành tiền</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for item in original.orderitem_set.all %}
+          <tr>
+            <td>
+              <a href="{% url 'admin:app_product_change' item.product.id %}">
+                {{ item.product.name }}
+              </a>
+            </td>
+            <td style="text-align:center;">{{ item.quantity }}</td>
+            <td>{{ item.product.price|floatformat:0 }} VNĐ</td>
+            <td><b>{{ item.thanh_tien|floatformat:0 }} VNĐ</b></td>
+          </tr>
+        {% empty %}
+          <tr>
+            <td colspan="4" style="text-align:center;">Không có sản phẩm nào</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+
+    <p style="margin-top:15px; font-size:16px; text-align:right;">
+      <b>Tổng tiền đơn hàng: </b>
+      {{ original.tong_tien|floatformat:0 }} VNĐ
+    </p>
+  {% endif %}
+{% endblock %}

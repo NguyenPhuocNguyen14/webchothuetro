@@ -1,0 +1,275 @@
+{% extends 'app/base.html' %}
+{% load static %}
+{% load humanize %}
+{% load custom_filters %}   {# thêm cái này để dùng currency_vn #}
+{% block main-content %}
+    <div class="container my-5">
+    <div class="row">
+            <div>
+                <h2 class="mb-0">Sản Phẩm</h2>
+                <small class="text-muted">
+                    {% if products.paginator %}
+                    {{ products.paginator.count }} sản phẩm
+                    {% else %}
+                    {{ products|length }} sản phẩm
+                    {% endif %}
+                </small>
+            </div>
+
+        
+        
+          <!-- ==================== BỘ LỌC ==================== -->
+    <aside class="col-lg-3 mb-4">
+      <div class="card rounded-4 shadow-sm p-3">
+        
+      
+
+          <!-- Khoảng giá -->
+          <h6 class="fw-bold mb-2">Khoảng giá</h6>
+          <div class="mb-3">
+            {% for val,label in price_ranges %}
+              <div class="form-check mb-2">
+                <input class="form-check-input" type="radio" name="price_range" value="{{ val }}" id="p{{ forloop.counter }}"
+                       {% if request.GET.price_range == val %}checked{% endif %}>
+                <label class="form-check-label" for="p{{ forloop.counter }}">{{ label }}</label>
+              </div>
+            {% endfor %}
+          </div>
+
+          <hr>
+
+         <!-- Quận -->
+        <h6 class="fw-bold mb-2">Quận</h6>
+            <div class="mb-3">
+                {% for d in districts %}
+                    <div class="form-check mb-2">
+                        <input class="form-check-input"
+                             type="radio"
+                             name="district"
+                            id="district{{ forloop.counter }}"
+                            value="{{ d }}"
+                        {% if request.GET.district == d %}checked{% endif %}>
+                        <label class="form-check-label" for="district{{ forloop.counter }}">{{ d }}</label>
+                            </div>
+                        {% empty %}
+                 <p class="text-muted small">Chưa có dữ liệu quận.</p>
+                    {% endfor %}
+                </div>
+
+
+          <hr>
+
+          <!-- Loại sản phẩm -->
+          <h6 class="fw-bold mb-2">Loại sản phẩm</h6>
+          <div class="mb-3">
+            {% for cat in categories %}
+              <div class="form-check mb-2">
+                <input class="form-check-input" type="radio" name="category" value="{{ cat.0 }}" id="cat{{ forloop.counter }}"
+                       {% if request.GET.category == cat.0 %}checked{% endif %}>
+                <label class="form-check-label" for="cat{{ forloop.counter }}">{{ cat.1 }}</label>
+              </div>
+            {% empty %}
+              <p class="text-muted small">Chưa có loại sản phẩm.</p>
+            {% endfor %}
+          </div>
+
+          <div class="mt-3">
+            <button type="submit" class="btn btn-success btn-sm w-100 rounded-pill">Lọc</button>
+            <a href="{% url 'product' %}" class="btn btn-link btn-sm w-100 text-muted">Xóa bộ lọc</a>
+          </div>
+        </form>
+      </div>
+    </aside>
+       <section class="col-lg-9">
+            <div class="row g-4">
+                {% for p in products %}
+                <div class="col-6 col-md-4 col-lg-3">
+                    <div class="card product-card h-100 rounded-4 shadow-sm border-0 position-relative overflow-hidden">
+                        <!-- Heart -->
+                        <button class="btn btn-wish update-wishlist" data-product="{{ p.id }}" title="Yêu thích" aria-label="Yêu thích">
+                            <span class="heart">❤</span>
+                        </button>
+
+                       <!-- Discount -->
+                        {% if p.discount_percent %}
+                        <div class="ribbon">-{{ p.discount_percent }}%</div>
+                        {% endif %}
+
+                        <a href="{% url 'product_detail' p.id %}" class="text-decoration-none text-dark">
+                            {% if p.image %}
+                            <div class="product-img-wrap">
+                                <img src="{{ p.image.url }}" class="card-img-top product-thumb" alt="{{ p.name }}">
+                            </div>
+                            {% else %}
+                            <div class="product-img-wrap bg-light d-flex align-items-center justify-content-center">
+                                <img src="{% static 'app/images/placeholder.png' %}" class="card-img-top product-thumb" alt="{{ p.name }}">
+                            </div>
+                            {% endif %}
+
+                             <div class="card-body text-center">
+                                <h6 class="product-title mb-2">{{ p.name|truncatechars:40 }}</h6>
+                                <p class="product-location text-muted mb-2">{{ p.location|default:"Chưa rõ vị trí" }}</p>
+
+                                {% if p.discount_percent %}
+                                <p class="mb-0">
+                                    <span class="text-muted text-decoration-line-through small">{{ p.price|currency_vn }}</span>
+                                </p>
+                                <p class="product-price mb-0">{{ p.gia_giam|currency_vn }}</p>
+                                {% else %}
+                                <p class="product-price mb-0">{{ p.price|currency_vn }}</p>
+                                {% endif %}
+                            </div>
+                        </a>
+
+                       <div class="card-footer bg-white border-0 pt-0">
+                            <div class="d-flex justify-content-center gap-2">
+                                <a href="{% url 'product_detail' p.id %}" class="btn btn-green btn-sm rounded-pill px-3">
+                                    <span class="btn-text">Xem chi tiết</span>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% empty %} 
+                <div class="col-12">
+                    <p class="text-center text-muted">Không có sản phẩm phù hợp.</p>
+                </div>
+                {% endfor %}
+            </div>
+
+            <div class="mt-4 d-flex justify-content-center">
+                {% if is_paginated %}
+                <nav aria-label="Page navigation">
+                    <ul class="pagination">
+                        {% if page_obj.has_previous %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% for k, v in request.GET.items %}{% if k != 'page' %}&{{ k }}={{ v }}{% endif %}{% endfor %}" aria-label="Previous">
+                                <span aria-hidden="true">&laquo;</span>
+                            </a>
+                        </li>
+                        {% else %}
+                        <li class="page-item disabled"><span class="page-link">&laquo;</span></li>
+                        {% endif %}
+
+                        {% for num in page_obj.paginator.page_range %}
+                        {% if page_obj.number == num %}
+                        <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+                        {% elif num > page_obj.number|add:-3 and num < page_obj.number|add:3 %}
+                        <li class="page-item"><a class="page-link" href="?page={{ num }}{% for k, v in request.GET.items %}{% if k != 'page' %}&{{ k }}={{ v }}{% endif %}{% endfor %}">{{ num }}</a></li>
+                        {% endif %}
+                        {% endfor %}
+
+                        {% if page_obj.has_next %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ page_obj.next_page_number }}{% for k, v in request.GET.items %}{% if k != 'page' %}&{{ k }}={{ v }}{% endif %}{% endfor %}" aria-label="Next">
+                                <span aria-hidden="true">&raquo;</span>
+                            </a>
+                        </li>
+                        {% else %}
+                        <li class="page-item disabled"><span class="page-link">&raquo;</span></li>
+                        {% endif %}
+                    </ul>
+                </nav>
+                {% endif %}
+            </div>
+        </section>
+    </div>
+</div>
+
+<style>
+    /* card */
+    .product-card {
+        border: 1.5px solid rgba(0,0,0,0.06);
+        display:flex;
+        flex-direction:column;
+        justify-content:space-between;
+        transition: transform .22s ease, box-shadow .22s ease;
+        position:relative;
+    }
+    .product-card:hover { transform: translateY(-6px); box-shadow:0 8px 28px rgba(15,15,15,0.06); }
+
+    /* image area */
+    .product-img-wrap {
+        height:180px;
+        display:flex;
+        align-items:center;
+        justify-content:center;
+        overflow:hidden;
+        background:#fff;
+        border-top-left-radius:.75rem;
+        border-top-right-radius:.75rem;
+        position:relative;
+    }
+    .product-thumb { width:100%; height:100%; object-fit:cover; transition:transform .25s ease; }
+    .product-card:hover .product-thumb { transform: scale(1.04); }
+
+    /* wishlist heart on top-left */
+    .btn-wish {
+        position: absolute;
+        top: 10px;
+        left: 10px;
+        z-index: 40;
+        width:36px;
+        height:36px;
+        border-radius:50%;
+        display:flex;
+        align-items:center;
+        justify-content:center;
+        border:1px solid rgba(0,0,0,0.08);
+        background: #fff;
+        cursor:pointer;
+        transition: transform .15s ease, background .15s ease;
+    }
+    .btn-wish .heart { color:#e63946; font-size:16px; line-height:1; }
+    .btn-wish:hover { transform: scale(1.05); box-shadow:0 2px 8px rgba(0,0,0,0.06); }
+    .update-wishlist.added, .btn-wish.added { background:#e63946 !important; color:#fff !important; border-color:#e63946 !important; }
+    .footer-wish { display:inline-flex; }
+    @media (max-width:576px) {
+        .footer-wish { display:none; }
+    }
+
+    /* discount ribbon top-right */
+    .ribbon {
+        position:absolute;
+        top:10px;
+        right:10px;
+        z-index:40;
+        background: linear-gradient(90deg,#e63946,#ff7b7b);
+        color:#fff;
+        padding:6px 8px;
+        font-weight:700;
+        font-size:12px;
+        border-radius:6px;
+        box-shadow:0 4px 10px rgba(0,0,0,0.08);
+    }
+
+    .product-title { font-size:.95rem; font-weight:600; min-height:38px; }
+    .product-location { color:#6c757d; }
+    .product-price { color:#e61f3d; font-weight:700; margin-top:6px; }
+
+    .card-footer { background:transparent; }
+
+    /* ✅ fix nút cùng chiều cao + căn giữa */
+    .card-footer .btn {
+        display:flex;
+        align-items:center;
+        justify-content:center;
+        height:36px;
+        font-weight:500;
+    }
+    .card-footer .btn .btn-text {
+        line-height:1;
+    }
+
+    @media (max-width:767px) {
+        .product-img-wrap { height:140px; }
+        .btn-wish { width:34px; height:34px; top:8px; left:8px; }
+    }
+</style>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+    // JS cho update-wishlist & update-cart vẫn hoạt động bình thường
+});
+</script>
+{% endblock main-content %}

@@ -1,0 +1,62 @@
+{% extends "admin/base_site.html" %}
+
+{% block messages %}{% endblock %}  {# ✅ Ẩn thông báo mặc định Django Admin #}
+
+{% block content %}
+<h2>💬 Hội thoại với {{ user_chat.username }}</h2>
+
+<div style="border:1px solid #ddd; padding:15px; border-radius:12px; 
+            max-height:500px; overflow-y:auto; background:#f5f6f7;">
+  {% for msg in messages %}
+    <div style="margin:10px 0; 
+                display:flex; 
+                {% if msg.sender == 'admin' %}justify-content:flex-end;{% else %}justify-content:flex-start;{% endif %}">
+
+      <div style="
+        max-width:70%;
+        padding:10px 14px;
+        border-radius:16px;
+        {% if msg.sender == 'admin' %}
+          background:#0084ff; color:white; border-bottom-right-radius:4px;
+        {% else %}
+          background:#fff; color:#333; border:1px solid #ddd; border-bottom-left-radius:4px;
+        {% endif %}
+        word-wrap:break-word;
+        box-shadow:0 2px 4px rgba(0,0,0,0.1);
+      ">
+        {% if msg.message %}
+          <div>{{ msg.message }}</div>
+        {% endif %}
+
+        {% if msg.image %}
+          <div style="margin-top:6px;">
+            <a href="{{ msg.image.url }}" target="_blank">
+              <img src="{{ msg.image.url }}" alt="Hình ảnh" 
+                   style="max-width:220px; border-radius:10px; 
+                          box-shadow:0 2px 6px rgba(0,0,0,0.2); cursor:pointer;">
+            </a>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+    <div style="font-size:11px; color:#888; margin:2px 5px;
+                {% if msg.sender == 'admin' %}text-align:right;{% else %}text-align:left;{% endif %}">
+      {{ msg.created_at|date:"H:i d/m/Y" }}
+    </div>
+  {% empty %}
+    <p class="text-center text-muted">Chưa có tin nhắn nào.</p>
+  {% endfor %}
+</div>
+
+<!-- Form gửi tin nhắn -->
+<form method="post" action="{% url 'send_direct_message' %}" enctype="multipart/form-data" style="margin-top:15px;">
+  {% csrf_token %}
+  <input type="hidden" name="user_id" value="{{ user_chat.id }}">
+  <div style="display:flex; gap:8px; align-items:center;">
+    <input type="text" name="message" class="vTextField" 
+           placeholder="Nhập tin nhắn..." style="flex:1; padding:8px 10px; border-radius:6px; border:1px solid #ccc;">
+    <input type="file" name="image" accept="image/*" style="max-width:180px;">
+    <button type="submit" class="button btn btn-success">Gửi</button>
+  </div>
+</form>
+{% endblock %}

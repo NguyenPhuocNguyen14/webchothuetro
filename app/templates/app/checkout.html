@@ -1,0 +1,103 @@
+{% extends 'app/base.html' %}
+{% load static humanize %}
+{% load custom_filters %}
+{% block content_checkout %}
+<div class="container my-5">
+  <div class="row g-4">
+    <!-- Thông tin khách hàng -->
+    <div class="col-lg-6">
+      <div class="card shadow-lg border-0 rounded-4">
+        <div class="card-body p-4">
+          <h4 class="fw-bold mb-3 text-primary">👤 Thông tin khách hàng</h4>
+          
+          <!-- Form khách hàng -->
+          <form id="form-shipping" method="POST" action="{% url 'process_order' %}">
+            {% csrf_token %}
+            <div class="mb-3">
+              <input required class="form-control rounded-3" type="text" name="name" placeholder="Họ và tên">
+            </div>
+            <div class="mb-3">
+              <input required class="form-control rounded-3" type="email" name="email" placeholder="Email">
+            </div>
+
+            <h5 class="mt-4">📦 Địa chỉ giao hàng</h5>
+            <hr>
+            <div class="mb-2"><input required class="form-control rounded-3" type="text" name="address" placeholder="Địa chỉ"></div>
+            <div class="mb-2"><input required class="form-control rounded-3" type="text" name="city" placeholder="Thành phố"></div>
+            <div class="mb-2"><input required class="form-control rounded-3" type="text" name="state" placeholder="Tỉnh / Bang"></div>
+            <div class="mb-2"><input required class="form-control rounded-3" type="text" name="mobile" placeholder="Số điện thoại"></div>
+            <div class="mb-2"><input required class="form-control rounded-3" type="text" name="country" placeholder="Quốc gia"></div>
+
+            <!-- Phương thức thanh toán -->
+            <div id="payment-method" class="mt-4">
+              <h5>💳 Phương thức thanh toán</h5>
+              <hr>
+              <div class="form-check">
+                <input class="form-check-input" type="radio" name="payment" id="cod" value="COD" checked>
+                <label class="form-check-label fw-semibold" for="cod">
+                  Thanh toán khi nhận hàng (COD)
+                </label>
+              </div>
+            </div>
+
+            <!-- Submit form -->
+            <div class="d-grid mt-3">
+              <button type="submit" class="btn btn-success rounded-pill fw-semibold">
+                ✅ Xác nhận đặt hàng
+              </button>
+            </div>
+          </form>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- Tóm tắt đơn hàng -->
+    <div class="col-lg-6" id="checkout-cart">
+      <div class="card shadow-lg border-0 rounded-4">
+        <div class="card-body p-4">
+          <a class="btn btn-outline-dark mb-3 rounded-pill" href="{% url 'cart' %}">⬅ Quay lại giỏ hàng</a>
+          <h4 class="fw-bold mb-3 text-success">🛒 Tóm tắt đơn hàng</h4>
+
+          {% if cart_products %}
+            {% for cp in cart_products %}
+            <div class="cart-row d-flex align-items-center justify-content-between border-bottom py-2" data-id="{{ cp.product.id }}">
+              <div class="d-flex align-items-center" style="flex:2;">
+                {% if cp.product and cp.product.image %}
+                  <img src="{{ cp.product.image.url }}" alt="{{ cp.product.name }}" class="rounded shadow-sm me-2" style="width:60px; height:60px; object-fit:cover;">
+                {% else %}
+                  <img src="{% static 'app/images/no-image.png' %}" class="rounded shadow-sm me-2" style="width:60px; height:60px;">
+                {% endif %}
+                <div>
+                  <p class="mb-0 fw-semibold">{{ cp.product.name }}</p>
+                  <small class="text-muted">ID: {{ cp.product.id }}</small>
+                </div>
+              </div>
+              <p class="mb-0 text-primary unit-price" style="flex:1;">
+                {{ cp.unit_price|currency_vn }}
+              </p>
+              <div style="flex:1;" class="d-flex align-items-center justify-content-center">
+                <span class="mx-2 quantity fw-bold">{{ cp.total_quantity }}</span>
+              </div>
+              <p class="mb-0 fw-bold text-success item-total" style="flex:1;">
+                {{ cp.total_price|currency_vn }}
+              </p>
+            </div>
+            {% endfor %}
+          {% else %}
+            <p id="empty-checkout" class="text-muted text-center my-4">Giỏ hàng trống 😢</p>
+          {% endif %}
+
+          <hr>
+          <h5>Số lượng: <span class="text-primary">{{ incomplete_count|default:0 }}</span></h5>
+          <h5>Tổng tiền: 
+            <span class="fw-bold text-success">
+              {{ incomplete_total|default:0|currency_vn }}
+            </span>
+          </h5>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock content_checkout %}

@@ -1,0 +1,567 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="The Fern House - Cửa hàng cây cảnh, cây nội thất, cây văn phòng và phụ kiện trang trí nhà cửa.">
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+    
+    <link href="{% static 'app/css/style.css' %}" rel="stylesheet" />
+    <link href="{% static 'app/css/owl.carousel.min.css' %}" rel="stylesheet" />
+    <link href="{% static 'app/css/all.min.css' %}" rel="stylesheet" />
+    <link href="{% static 'app/css/main.css' %}" rel="stylesheet" />
+
+    <title>The Tiller House</title>
+
+    <style>
+        :root {
+            --primary: #1a1e1cff;
+            --bg: #f6f7f9;
+        }
+        body {
+            background: var(--bg);
+            font-family: "Inter", system-ui, sans-serif;
+            transition: background 0.3s, color 0.3s;
+        }
+        .navbar {
+            background: #cdded7ff;
+            border-bottom: 1px solid rgba(0,0,0,0.05);
+        }
+        .navbar .navbar-brand { 
+            font-weight: 700; 
+            color: var(--primary); 
+            display:flex; 
+            align-items:center;
+            gap:10px; 
+        }
+        .navbar .navbar-brand img { 
+    border-radius: 50%;   /* ép hình tròn */
+    width: 60px;          /* giảm size cho vừa khung navbar */
+    height: 60px;         /* giữ tỉ lệ vuông */
+    object-fit: cover;    /* ảnh không bị méo */
+    background: #cdded7ff; /* nền đồng bộ, tránh viền trắng nếu logo PNG */
+    padding: 5px;         /* tạo khoảng cách nhỏ trong khung */
+    border: 2px solid #fff; /* viền trắng nhẹ cho đẹp (tùy thích) */
+}
+
+        .navbar .navbar-brand span { 
+            font-size:1.5rem; 
+            line-height:1; 
+            display:flex; 
+            align-items:center;
+        }
+        .navbar .nav-link { color:#333; padding: .5rem .8rem; }
+        .navbar .nav-link:hover { color: var(--primary); }
+        .btn-outline-success {
+            border-color: var(--primary);
+            color: var(--primary);
+            transition: all 0.3s;
+        }
+        .btn-outline-success:hover {
+            background: var(--primary);
+            color:#fff;
+        }
+        .product-card img {
+            max-width: 50% !important;
+            height: auto;
+            margin: 0 auto;
+            display: block;
+        }
+        body.dark-mode {
+            background: #121212;
+            color: #e9ecef;
+        }
+        body.dark-mode .navbar {
+            background: #1e1e1e !important;
+        }
+        body.dark-mode .navbar .nav-link {
+            color: #e9ecef;
+        }
+        body.dark-mode .navbar .nav-link:hover {
+            color: var(--primary);
+        }
+        body.dark-mode footer {
+            background: #1e1e1e !important;
+        }
+        body.dark-mode .card,
+        body.dark-mode .box-element,
+        body.dark-mode input,
+        body.dark-mode select,
+        body.dark-mode textarea {
+            background: #1e1e1e !important;
+            color: #e9ecef !important;
+            border-color: #555 !important;
+        }
+        body.dark-mode .navbar-toggler-icon,
+        body.dark-mode svg path,
+        body.dark-mode svg circle {
+            stroke: #e9ecef !important;
+            fill: #e9ecef !important;
+        }
+        body.dark-mode button {
+            border-color: var(--primary) !important;
+            color: var(--primary) !important;
+        }
+        body.dark-mode button:hover {
+            background: var(--primary) !important;
+            color: #fff !important;
+        }
+        #darkModeToggle {
+            cursor: pointer;
+            border: none;
+            background: transparent;
+            font-size: 1.5rem;
+            margin-left: 1rem;
+        }
+        main.container {
+            margin-top: 2rem;
+            margin-bottom: 2rem;
+        }
+        .update-wishlist.added { 
+            background-color:#e63946 !important; 
+            color:white !important; 
+            border-color:#e63946 !important;
+        }
+        .update-wishlist.added::after { 
+            content:" ✓"; 
+            font-weight:bold;
+        }
+        .toast-container {
+            z-index: 1080;
+        }
+    </style>
+</head>
+<body>
+<nav class="navbar navbar-expand-lg sticky-top shadow-sm">
+    <div class="container align-items-center">
+        <a class="navbar-brand" href="{% url 'home' %}">
+            <img src="{% static 'app/images/LOGONEW.png' %}" alt="logo" loading="lazy"/>
+            <span>The Tiller House</span>
+        </a>
+
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" 
+                data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" 
+                aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse justify-content-between" id="navbarSupportedContent">
+            <ul class="navbar-nav mb-2 mb-lg-0">
+                <li class="nav-item"><a class="nav-link active" href="{% url 'home' %}">Trang chủ</a></li>
+                <li class="nav-item"><a class="nav-link" href="{% url 'product' %}">Sản Phẩm</a></li>
+               <li class="nav-item"><a class="nav-link" href="{% url 'direct_chat' %}">Tư Vấn</a></li>
+
+                <li class="nav-item">
+    <a class="nav-link" href="{% url 'contact' %}">Liên Hệ</a>
+</li>
+
+            </ul>
+
+            <form class="d-flex me-3" method="get" action="{% url 'product' %}">
+                <input class="form-control form-control-sm me-2" type="search" name="q" placeholder="Tìm kiếm sản phẩm..." 
+                        value="{{ request.GET.q|default:'' }}" aria-label="Search">
+                {% for k,v in request.GET.items %}
+                    {% if k != 'q' %}
+                        <input type="hidden" name="{{ k }}" value="{{ v }}">
+                    {% endif %}
+                {% endfor %}
+                <button class="btn btn-outline-success btn-sm" type="submit">Tìm</button>
+            </form>
+
+            <ul class="navbar-nav align-items-center">
+                {% if request.user.is_authenticated %}
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">{{ request.user.username }}</a>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li><a class="dropdown-item" href="#">Trang Cá Nhân</a></li>
+                        <li><a class="dropdown-item" href="{% url 'cart' %}">Đơn Hàng</a></li>
+                        <li>
+                            <form method="post" action="{% url 'logout' %}" class="d-inline">
+                                {% csrf_token %}
+                                <button type="submit" class="dropdown-item">Thoát</button>
+                            </form>
+                        </li>
+                    </ul>
+                </li>
+                {% else %}
+                <li class="nav-item"><a class="nav-link" href="{% url 'login' %}">Đăng Nhập</a></li>
+                <li class="nav-item"><a class="nav-link" href="{% url 'signup' %}">Đăng Ký</a></li>
+                {% endif %}
+
+                <li class="nav-item position-relative">
+    <a class="nav-link d-flex align-items-center" href="{% url 'cart' %}">
+        <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" 
+             viewBox="0 0 24 24" fill="none" stroke="#333" stroke-width="2" 
+             stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="9" cy="21" r="1.5"/>
+            <circle cx="20" cy="21" r="1.5"/>
+            <path d="M1 1h4l2.68 13.39a1 1 0 0 0 .99.81h12.72a1 1 0 0 0 .98-.79L23 6H6"/>
+        </svg>
+        {% if request.user.is_authenticated %}
+        <span id="cart-total-count" 
+              class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger shadow-sm">
+            {{ incomplete_count|default:0 }}
+            <span class="visually-hidden">items in cart</span>
+        </span>
+        {% endif %}
+    </a>
+</li>
+
+
+                <li class="nav-item position-relative">
+                    <a class="nav-link" href="{% url 'wishlist' %}">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#333" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M12 21s-6-5.33-10-10C-1 5.33 4-1 12 5c8-6 13 0 10 6-4 4.67-10 10-10 10z"/>
+                        </svg>
+                        {% if request.user.is_authenticated %}
+                        <span id="wishlist-total-count" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger shadow-sm">
+                            {{ wishlist_count|default:0 }}
+                            <span class="visually-hidden">items in wishlist</span>
+                        </span>
+                        {% endif %}
+                    </a>
+                </li>
+                <button id="darkModeToggle" title="Chuyển giao diện">🌙</button>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<main class="container">
+    {% block banner_slider %}{% endblock %}
+    {% block main-content %}{% endblock %}
+    {% block cart_content %}{% endblock %}
+    {% block content_checkout %}{% endblock %}
+    {% block content %}{% endblock %}
+</main>
+
+<footer class="container-fluid text-dark py-4 mt-5" style="background-color: #cdded7ff; font-size: 1.05rem;">
+  <div class="container">
+    <div class="row text-center text-md-start align-items-start">
+
+      <!-- Cột 1: Bản quyền -->
+      <div class="col-12 col-md-4 mb-3 mb-md-0 fw-bold" style="font-size: 1.2rem;">
+        <strong>The Tiller House</strong><br>© Megas Meta
+      </div>
+
+      <!-- Cột 2: Thông tin liên hệ -->
+      <div class="col-12 col-md-4 d-flex flex-column align-items-center align-items-md-start gap-2 fw-medium">
+        <span>
+          <i class="fas fa-phone-alt text-success me-2"></i>
+          <a href="tel:0842538931" class="text-dark">0842-538-931</a>
+        </span>
+        <span>
+          <i class="fas fa-envelope text-danger me-2"></i>
+          <a href="mailto:thefernhouse@gmail.com" class="text-dark">thetillerhouse@gmail.com</a>
+        </span>
+        <span>
+          <i class="fas fa-map-marker-alt text-warning me-2"></i>
+          47 Tân Hương, Tân Phú, TP.HCM
+        </span>
+      </div>
+
+      <!-- Cột 3: Mạng xã hội -->
+      <div class="col-12 col-md-4 d-flex justify-content-center justify-content-md-end gap-3 mt-3 mt-md-0">
+        <!-- Zalo -->
+        <a href="https://zalo.me/0842538931" target="_blank" class="d-flex align-items-center justify-content-center rounded-circle" 
+           style="width:38px;height:38px;background:#fff;box-shadow:0 2px 6px rgba(0,0,0,0.1);">
+          <img src="https://upload.wikimedia.org/wikipedia/commons/9/91/Icon_of_Zalo.svg" 
+               alt="Zalo" style="width:22px;height:22px;">
+        </a>
+
+        <!-- Facebook -->
+        <a href="https://www.facebook.com/share/g/1CPYrNpwqL/" target="_blank" 
+           class="d-flex align-items-center justify-content-center rounded-circle text-primary" 
+           style="width:38px;height:38px;background:#fff;box-shadow:0 2px 6px rgba(0,0,0,0.1);">
+          <i class="fab fa-facebook-f"></i>
+        </a>
+
+        <!-- Instagram -->
+        <a href="https://www.instagram.com/" target="_blank" 
+           class="d-flex align-items-center justify-content-center rounded-circle" 
+           style="width:38px;height:38px;background:#fff;box-shadow:0 2px 6px rgba(0,0,0,0.1);color:#E1306C;">
+          <i class="fab fa-instagram"></i>
+        </a>
+
+        <!-- TikTok -->
+        <a href="https://www.tiktok.com/" target="_blank" 
+           class="d-flex align-items-center justify-content-center rounded-circle text-dark" 
+           style="width:38px;height:38px;background:#fff;box-shadow:0 2px 6px rgba(0,0,0,0.1);">
+          <i class="fab fa-tiktok"></i>
+        </a>
+      </div>
+    </div>
+
+    
+</footer>
+
+
+
+
+<div id="toast" class="toast-container position-fixed top-0 end-0 p-3">
+    <div class="toast align-items-center text-bg-success border-0" role="alert">
+        <div class="d-flex">
+            <div class="toast-body"></div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script src="{% static 'app/js/owl.carousel.min.js' %}"></script>
+<script src="{% static 'app/js/myscript.js' %}"></script>
+<script src="{% static 'app/js/all.min.js' %}"></script>
+
+<script>
+    const user = "{{ request.user|default:'AnonymousUser' }}";
+
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== "") {
+            const cookies = document.cookie.split(";");
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + "=")) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+
+    function showToast(msg, isError = false) {
+        const toastEl = document.getElementById("toast");
+        const toastBody = toastEl.querySelector(".toast-body");
+        const toastDiv = toastEl.querySelector(".toast");
+
+        toastDiv.classList.remove("text-bg-success", "text-bg-danger");
+        toastDiv.classList.add(isError ? "text-bg-danger" : "text-bg-success");
+        toastBody.textContent = isError ? `❌ ${msg}` : `✅ ${msg}`;
+        
+        const toast = new bootstrap.Toast(toastDiv);
+        toast.show();
+    }
+
+    // Dark Mode toggle logic
+    const toggleBtn = document.getElementById('darkModeToggle');
+    const body = document.body;
+    const currentTheme = localStorage.getItem('theme');
+
+    if (currentTheme === 'dark') {
+        body.classList.add('dark-mode');
+        toggleBtn.textContent = '🌞';
+    }
+
+    toggleBtn.addEventListener('click', () => {
+        if (body.classList.contains('dark-mode')) {
+            body.classList.remove('dark-mode');
+            toggleBtn.textContent = '🌙';
+            localStorage.setItem('theme', 'light');
+        } else {
+            body.classList.add('dark-mode');
+            toggleBtn.textContent = '🌞';
+            localStorage.setItem('theme', 'dark');
+        }
+    });
+
+    // Cập nhật giỏ hàng và danh sách yêu thích (AJAX)
+    document.addEventListener("DOMContentLoaded", () => {
+        const csrfToken = getCookie("csrftoken");
+
+        function handleUpdate(url, productId, element, callback) {
+            if (user === 'AnonymousUser') {
+                showToast("Vui lòng đăng nhập để thực hiện chức năng này.", true);
+                return;
+            }
+
+            if (!productId || isNaN(productId)) {
+                showToast("Lỗi: ID sản phẩm không hợp lệ.", true);
+                return;
+            }
+
+            element.disabled = true;
+
+            fetch(url, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-CSRFToken": csrfToken,
+                },
+                body: JSON.stringify({ product_id: productId, productId: productId, action: 'add' }),
+            })
+            .then(res => {
+                if (!res.ok) {
+                    throw new Error(`Lỗi server: ${res.status}`);
+                }
+                return res.json();
+            })
+            .then(data => {
+                callback(data);
+            })
+            .catch(err => {
+                console.error("Lỗi khi cập nhật:", err);
+                showToast("Có lỗi xảy ra, vui lòng thử lại.", true);
+            })
+            .finally(() => {
+                setTimeout(() => {
+                    element.disabled = false;
+                }, 1000);
+            });
+        }
+
+        document.querySelectorAll(".update-cart").forEach(btn => {
+            btn.addEventListener("click", function() {
+                const productId = this.dataset.product;
+                const cartCountEl = document.getElementById("cart-total-count");
+
+                handleUpdate("{% url 'update_item' %}", productId, this, (data) => {
+                    if (cartCountEl) {
+                        cartCountEl.textContent = data.total_quantity;
+                    }
+                    showToast("Đã thêm sản phẩm vào giỏ hàng!");
+                });
+            });
+        });
+
+        document.querySelectorAll(".update-wishlist").forEach(btn => {
+            btn.addEventListener("click", function () {
+                const productId = this.dataset.product;
+                const wishlistCountEl = document.getElementById("wishlist-total-count");
+                
+                handleUpdate("{% url 'toggle_wishlist' %}", productId, this, (data) => {
+                    if (data.status === "added") {
+                        btn.classList.add("added");
+                        if (wishlistCountEl) wishlistCountEl.textContent = data.wishlist_count;
+                        showToast("Đã thêm vào danh sách yêu thích!");
+                    } else if (data.status === "removed") {
+                        btn.classList.remove("added");
+                        if (wishlistCountEl) wishlistCountEl.textContent = data.wishlist_count;
+                        showToast("Đã xóa khỏi danh sách yêu thích!");
+                    }
+                });
+            });
+        });
+    });
+</script>
+<!-- ================= Chatbot AI ================= -->
+<div id="chatbot" style="
+    position:fixed;
+    bottom:140px;   /* 👈 nâng lên cao hơn để không che footer */
+    right:20px;
+    width:350px;
+    max-width:90%;
+    z-index:1100;
+    border-radius:20px;
+    overflow:hidden;
+    box-shadow:0 4px 15px rgba(0,0,0,0.2);
+">
+
+    <!-- Header -->
+    <div id="chatbot-header" 
+         style="
+                background:#fff;       /* nền trắng */
+         color:#000;     
+             padding:10px;
+             border-radius:20px;
+             cursor:pointer;
+             text-align:center;
+         ">
+         <!-- Logo đẹp -->
+          <img src="{% static 'app/images/logoHouse.png' %}" alt="logo" 
+   
+         style="width:35px; height:35px; border-radius:50%; object-fit:cover; margin-right:10px;">
+         Chuyên Tư Vấn AI 
+        <span id="chatbot-close" style="float:right;cursor:pointer;">✖</span>
+    </div>
+
+    <!-- Body -->
+    <div id="chatbot-body" 
+         style="
+             display:none;
+             background:#fff;
+             border:1px solid #ccc;
+             border-top:none;
+             height:400px;
+             overflow-y:auto;
+             padding:10px;
+             border-radius:0 0 20px 20px;
+         ">
+        <div id="chatbot-messages"></div>
+        <div style="margin-top:10px;display:flex;gap:5px;">
+            <input type="text" id="chatbot-input" placeholder="Nhập câu hỏi..." 
+                   style="flex:1;padding:8px;border:1px solid #ccc;border-radius:20px;">
+            <button id="chatbot-send" class="btn btn-success btn-sm" style="border-radius:20px;">Gửi</button>
+        </div>
+    </div>
+</div>
+<script>
+    const chatbotHeader = document.getElementById('chatbot-header');
+    const chatbotBody = document.getElementById('chatbot-body');
+    const chatbotClose = document.getElementById('chatbot-close');
+    const chatbotMessages = document.getElementById('chatbot-messages');
+    const chatbotInput = document.getElementById('chatbot-input');
+    const chatbotSend = document.getElementById('chatbot-send');
+
+    chatbotHeader.addEventListener('click', () => {
+        chatbotBody.style.display = chatbotBody.style.display === 'none' ? 'block' : 'none';
+    });
+    chatbotClose.addEventListener('click', () => {
+        chatbotBody.style.display = 'none';
+    });
+
+  function addMessage(content, fromUser = true) {
+    const div = document.createElement('div');
+    div.style.marginBottom = '8px';
+    div.style.textAlign = fromUser ? 'right' : 'left';
+
+    // 🚀 Giữ nguyên HTML từ server (không escape)
+    div.innerHTML = `
+        <div style="display:inline-block;padding:6px 10px;border-radius:10px;max-width:85%;
+                    background:${fromUser ? '#218c57' : '#f1f1f1'};color:${fromUser ? '#fff' : '#333'};">
+            ${content}
+        </div>`;
+
+    chatbotMessages.appendChild(div);
+    chatbotMessages.scrollTop = chatbotMessages.scrollHeight;
+}
+
+
+
+    async function sendMessage() {
+        const message = chatbotInput.value.trim();
+        if (!message) return;
+        addMessage(message, true);
+        chatbotInput.value = '';
+        addMessage('...', false);
+
+        try {
+            const res = await fetch("{% url 'chatbot_ai' %}", {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCookie('csrftoken')
+                },
+                body: JSON.stringify({message})
+            });
+            const data = await res.json();
+            // Xóa "..." cuối cùng
+            const last = chatbotMessages.lastChild;
+            if (last && last.textContent === '...') last.remove();
+            addMessage(data.answer, false);
+        } catch (err) {
+            console.error(err);
+            addMessage('Có lỗi xảy ra, thử lại sau 😅', false);
+        }
+    }
+
+    chatbotSend.addEventListener('click', sendMessage);
+    chatbotInput.addEventListener('keydown', e => { if(e.key==='Enter') sendMessage(); });
+</script>
+
+</body>
+</html>

@@ -1,0 +1,214 @@
+{% extends 'app/base.html' %}
+{% load static humanize %}
+{% load custom_filters %}
+{% block cart_content %}
+<div class="container my-5">
+  <div class="card shadow-lg border-0 rounded-4 cart-card">
+    <div class="card-body p-4">
+      <a class="btn btn-outline-dark mb-3" href="{% url 'home' %}">
+        ⬅ Tiếp tục mua sắm
+      </a>
+
+      <h3 class="mb-4 fw-bold text-center cart-title">🛒 Giỏ hàng của bạn</h3>
+
+      <!-- Tổng quan -->
+      <div class="d-flex justify-content-between align-items-center cart-summary p-3 rounded-3 shadow-sm mb-4">
+        <span><strong>Số lượng:</strong> 
+          <span id="cart-total-count-page" class="text-primary">
+            {{ incomplete_count|default:0 }}
+          </span>
+        </span>
+        <span><strong>Tổng tiền:</strong> 
+          <span id="cart-total-price" class="fw-bold text-success">
+            {{ incomplete_total|default:0|currency_vn }}
+          </span>
+        </span>
+        {% if cart_products %}
+          <a class="btn btn-success px-4 rounded-pill fw-semibold" href="{% url 'checkout' %}">Thanh toán</a>
+        {% endif %}
+      </div>
+
+      <!-- Bảng sản phẩm -->
+      {% if cart_products %}
+      <div class="table-responsive">
+        <table class="table align-middle table-hover border rounded-3 overflow-hidden shadow-sm text-center cart-table">
+          <thead class="cart-thead">
+            <tr>
+              <th style="width:100px;">Hình</th>
+              <th>Tên sản phẩm</th>
+              <th>Giá</th>
+              <th>Số lượng</th>
+              <th>Tổng</th>
+              <th>Đơn hàng</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for item in cart_products %}
+            <tr data-product-id="{{ item.product.id }}">
+              <td>
+                {% if item.product.image %}
+                  <img src="{{ item.product.image.url }}" class="img-fluid rounded shadow-sm" style="max-height:60px;" alt="{{ item.product.name }}">
+                {% else %}
+                  <img src="{% static 'app/images/no-image.png' %}" class="img-fluid rounded shadow-sm" style="max-height:60px;" alt="No image">
+                {% endif %}
+              </td>
+              <td class="fw-semibold">
+                {{ item.product.name }} <br>
+                <small class="text-muted">ID: {{ item.product.id }}</small>
+              </td>
+              <td class="text-primary">{{ item.unit_price|currency_vn }}</td>
+              <td>
+                <div class="d-flex justify-content-center align-items-center">
+                  <button class="btn btn-sm btn-outline-danger me-2 update-btn" data-action="remove">-</button>
+                  <span class="badge bg-gradient bg-primary fs-6 px-3 py-2 product-quantity">{{ item.total_quantity }}</span>
+                  <button class="btn btn-sm btn-outline-success ms-2 update-btn" data-action="add">+</button>
+                </div>
+              </td>
+              <td class="fw-bold text-success product-total">{{ item.total_price|currency_vn }}</td>
+              <td>
+                {% if item.order_ids %}
+                  {% for oid in item.order_ids %}
+                    <span class="badge bg-info text-dark shadow-sm me-1">#{{ oid }}</span>
+                  {% endfor %}
+                {% else %}
+                  <span class="text-muted">Chưa có</span>
+                {% endif %}
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      {% else %}
+        <p class="text-center text-muted fs-5 my-4">Giỏ hàng trống </p>
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+<!-- 🔹 Lịch sử mua hàng -->
+<div class="card shadow-lg border-0 rounded-4 mt-4">
+  <div class="card-body p-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+  <h3 class="fw-bold text-success mb-0">📜 Lịch sử mua hàng</h3>
+  <a href="{% url 'order_history' %}" class="btn btn-outline-primary fw-semibold rounded-pill px-4">
+    Xem tất cả →
+  </a>
+</div>
+
+
+    {% if past_orders %}
+    <div class="table-responsive">
+      <table class="table table-hover text-center align-middle border rounded-3 shadow-sm">
+        <thead style="background-color: #cdded7ff; color: #000; border-radius: 8px;">
+          <tr>
+            <th>Mã đơn</th>
+            <th>Ngày đặt</th>
+            <th>Sản phẩm</th>
+            <th>Tổng tiền</th>
+            <th>Trạng thái</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for order in past_orders %}
+          <tr>
+            <td>#{{ order.id }}</td>
+            <td>{{ order.date_order|date:"d/m/Y H:i" }}</td>
+            <td class="text-start">
+              {% for oi in order.orderitem_set.all %}
+                <div class="mb-1">
+                  <span class="fw-semibold">{{ oi.product.name }}</span> × {{ oi.quantity }}
+                  <span class="text-primary">({{ oi.product.gia_giam|currency_vn }})</span>
+                  = <span class="fw-bold text-success">{{ oi.thanh_tien|currency_vn }}</span>
+                </div>
+              {% endfor %}
+            </td>
+            <td class="fw-bold text-success">{{ order.get_cart_total|currency_vn }}</td>
+            <td>
+              {% if order.complete %}
+                <span class="badge bg-success">Hoàn tất</span>
+              {% else %}
+                <span class="badge bg-warning text-dark">Đang xử lý</span>
+              {% endif %}
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% else %}
+      <p class="text-center text-muted fs-5">Bạn chưa có đơn hàng nào </p>
+    {% endif %}
+  </div>
+</div>
+
+
+
+
+<!-- ===================== JS Ajax Update ===================== -->
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  const buttons = document.querySelectorAll('.update-btn');
+
+  buttons.forEach(btn => {
+    btn.addEventListener('click', function () {
+      const row = btn.closest('tr');
+      const productId = row.dataset.productId;
+      const action = btn.dataset.action;
+
+      fetch("{% url 'update_item' %}", {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRFToken': '{{ csrf_token }}'
+        },
+        body: JSON.stringify({'productId': productId, 'action': action})
+      })
+      .then(response => response.json())
+      .then(data => {
+        if(data.error) {
+          alert(data.error);
+          return;
+        }
+
+        if(data.quantity > 0){
+          row.querySelector('.product-quantity').textContent = data.quantity;
+          row.querySelector('.product-total').textContent = new Intl.NumberFormat('vi-VN').format(data.item_total) + ' VNĐ';
+        } else {
+          row.remove();
+        }
+
+        const navCount = document.getElementById('cart-total-count');       
+        const pageCount = document.getElementById('cart-total-count-page');
+        const totalPrice = document.getElementById('cart-total-price');
+
+        if(navCount) navCount.textContent = data.total_quantity;
+        if(pageCount) pageCount.textContent = data.total_quantity;
+        if(totalPrice) totalPrice.textContent = new Intl.NumberFormat('vi-VN').format(data.total_price) + ' VNĐ';
+      })
+      .catch(err => console.error(err));
+    });
+  });
+});
+</script>
+
+<style>
+/* 🌞 Light mode */
+.cart-card { background: #fff; }
+.cart-title { color: #0d6efd; }
+.cart-summary { background: #f8f9fa; }
+.cart-thead { background: #cfe2ff; color: #000; }
+
+/* 🌙 Dark mode */
+@media (prefers-color-scheme: dark) {
+  body { background-color: #121212; color: #e9ecef; }
+  .cart-card { background: #1e1e1e; color: #e9ecef; }
+  .cart-title { color: #66b2ff; }
+  .cart-summary { background: #2c2c2c; border: 1px solid #444; }
+  .cart-table { color: #e9ecef; }
+  .cart-thead { background: #333; color: #fff; }
+  .table-hover tbody tr:hover { background-color: #2a2a2a; }
+  a, strong { color: #66b2ff; }
+}
+</style>
+{% endblock cart_content %}

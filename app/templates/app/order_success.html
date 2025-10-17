@@ -1,0 +1,36 @@
+{% extends "app/base.html" %}
+{% load custom_filters %}
+{% block content %}
+<div class="container py-5 text-center">
+  <div class="card shadow-lg border-0 rounded-4 p-4 mx-auto" style="max-width: 650px;">
+    <h2 class="text-success fw-bold mb-3">🎉 Đặt hàng thành công!</h2>
+    <p class="text-muted">Cảm ơn bạn đã mua hàng 💚 Đơn hàng của bạn đang được xử lý.</p>
+
+    <div class="mt-4 text-start">
+      <p class="fs-5 mb-1">📌 Mã đơn hàng: 
+        <b class="text-dark">#{{ order.id }}</b>
+      </p>
+      <p class="fs-5 mb-3">💰 Tổng tiền: 
+        <b class="text-success fs-4">{{ order.tong_tien|currency_vn }}</b>
+      </p>
+
+      <h5 class="fw-bold mb-2">📦 Sản phẩm đã đặt</h5>
+      <ul class="list-group shadow-sm rounded-3">
+        {% for item in order.orderitem_set.all %}
+          <li class="list-group-item d-flex justify-content-between align-items-center">
+            <div>
+              <b>{{ item.product.name }}</b> 
+              <small class="text-muted">(x{{ item.quantity }})</small>
+            </div>
+            <span class="fw-semibold text-primary">{{ item.thanh_tien|currency_vn }}</span>
+          </li>
+        {% endfor %}
+      </ul>
+    </div>
+
+    <a href="{% url 'home' %}" class="btn btn-primary rounded-pill fw-bold mt-4 px-4">
+      ⬅ Về trang chủ
+    </a>
+  </div>
+</div>
+{% endblock %}

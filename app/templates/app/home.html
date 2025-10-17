@@ -1,0 +1,630 @@
+{% extends 'app/base.html' %}
+{% load static %}
+{% load humanize %}
+{% load custom_filters %}
+
+{% block banner_slider %}
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+
+<div id="carouselExampleDark" class="carousel slide rounded-4 shadow-lg overflow-hidden" 
+     data-bs-ride="carousel" data-bs-interval="5000" data-bs-pause="hover">
+  <div class="carousel-inner">
+
+    <!-- Slide 1 -->
+<div class="carousel-item active">
+  <img src="{% static 'app/images/banner/banervn3.jpg' %}" 
+       class="d-block w-100 carousel-img" 
+       alt="Hình ảnh banner: The Tiller House" loading="lazy">
+  
+  <div class="carousel-caption d-none d-md-block caption-elegant caption-bottom-center">
+    <h5>Chào mừng bạn đến với The Tiller House</h5>
+    <p>Không gian sống lý tưởng – giải pháp tìm phòng trọ & căn hộ hiện đại cho mọi nhu cầu tại TP.HCM.</p>
+  </div>
+</div>
+
+
+<!-- Slide 2 -->
+<div class="carousel-item">
+  <img src="{% static 'app/images/banner/banervn4.jpg' %}" 
+       class="d-block w-100 carousel-img" 
+       alt="Hình ảnh banner: Dịch vụ chuyên nghiệp 24/7" loading="lazy">
+  
+</div>
+
+  </div>
+
+  <!-- Nút điều hướng -->
+  <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleDark" data-bs-slide="prev">
+    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+    <span class="visually-hidden">Previous</span>
+  </button>
+  <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleDark" data-bs-slide="next">
+    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+    <span class="visually-hidden">Next</span>
+  </button>
+</div> 
+
+<section class="feature-row py-4">
+  <div class="container">
+    <div class="row text-center g-4 align-items-stretch">
+      <div class="col-6 col-md-3">
+        <div class="feature-item p-3 shadow-sm rounded-3 h-100">
+          <div class="feature-icon mb-3" aria-hidden="true">
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <circle cx="12" cy="12" r="10" stroke="#0ea37a" stroke-width="1.6" fill="rgba(14,163,122,0.06)"/>
+              <path d="M12 7v6l4 2" stroke="#0ea37a" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <h6 class="fw-bold mb-1">Tiết kiệm thời gian</h6>
+          <p class="small text-muted mb-0">Tìm được điểm sống ưng ý trong tích tắc.</p>
+        </div>
+      </div>
+      <div class="col-6 col-md-3">
+        <div class="feature-item p-3 shadow-sm rounded-3 h-100">
+          <div class="feature-icon mb-3" aria-hidden="true">
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <path d="M4 13v-1a8 8 0 0 1 16 0v1" stroke="#0ea37a" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+              <rect x="3" y="13" width="4" height="6" rx="1.2" fill="rgba(14,163,122,0.06)" stroke="#0ea37a" stroke-width="1.2"/>
+              <rect x="17" y="13" width="4" height="6" rx="1.2" fill="rgba(14,163,122,0.06)" stroke="#0ea37a" stroke-width="1.2"/>
+            </svg>
+          </div>
+          <h6 class="fw-bold mb-1">Hỗ trợ tận tâm</h6>
+          <p class="small text-muted mb-0">Tư vấn viên được đào tạo bài bản và chuyên nghiệp.</p>
+        </div>
+      </div>
+      <div class="col-6 col-md-3">
+        <div class="feature-item p-3 shadow-sm rounded-3 h-100">
+          <div class="feature-icon mb-3" aria-hidden="true">
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <rect x="3" y="3" width="7" height="7" rx="1.2" fill="rgba(14,163,122,0.06)" stroke="#0ea37a" stroke-width="1.2"/>
+              <rect x="14" y="3" width="7" height="7" rx="1.2" fill="rgba(14,163,122,0.06)" stroke="#0ea37a" stroke-width="1.2"/>
+              <rect x="3" y="14" width="7" height="7" rx="1.2" fill="rgba(14,163,122,0.06)" stroke="#0ea37a" stroke-width="1.2"/>
+              <rect x="14" y="14" width="7" height="7" rx="1.2" fill="rgba(14,163,122,0.06)" stroke="#0ea37a" stroke-width="1.2"/>
+            </svg>
+          </div>
+          <h6 class="fw-bold mb-1">Đa dạng phân khúc</h6>
+          <p class="small text-muted mb-0">Hình thật, giá thật — nhiều lựa chọn.</p>
+        </div>
+      </div>
+      <div class="col-6 col-md-3">
+        <div class="feature-item p-3 shadow-sm rounded-3 h-100">
+          <div class="feature-icon mb-3" aria-hidden="true">
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <path d="M3 21h18" stroke="#0ea37a" stroke-width="1.6" stroke-linecap="round"/>
+              <path d="M7 21V8" stroke="#0ea37a" stroke-width="1.6" stroke-linecap="round"/>
+              <path d="M7 8c2-4 6-4 8 0" stroke="#0ea37a" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <h6 class="fw-bold mb-1">Pháp lý rõ ràng</h6>
+          <p class="small text-muted mb-0">Các điều khoản hợp đồng minh bạch về mặt pháp lý.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="video-section py-5">
+  <div class="container">
+    {% if video %}
+      <div class="row g-4 align-items-center">
+        
+        <!-- Cột video -->
+        <div class="col-md-6">
+          <div class="ratio ratio-16x9 rounded-4 shadow-lg overflow-hidden">
+            {% if video.file %}
+              <video controls autoplay muted 
+                     {% if video.thumbnail %}poster="{{ video.thumbnail.url }}"{% endif %}>
+                <source src="{{ video.file.url }}" type="video/mp4">
+                Trình duyệt của bạn không hỗ trợ video.
+              </video>
+            {% elif video.url %}
+              <iframe src="{{ video.url }}"
+                      frameborder="0"
+                      allowfullscreen
+                      class="w-100 h-100"></iframe>
+            {% endif %}
+          </div>
+          <h5 class="mt-3 fw-bold text-center">{{ video.title }}</h5>
+          <p class="text-muted text-center">{{ video.description|truncatechars:160 }}</p>
+        </div>
+
+        <!-- Cột giới thiệu -->
+<div class="col-md-6 d-flex align-items-center justify-content-center">
+  <div class="text-justify" style="max-width: 500px;">
+    <h3 class="fw-bold mb-3 text-center">The Tiller House từ MEGAS MeTa.</h3>
+    <ul class="list-unstyled">
+      <li class="mb-2">✔ Chuyên trang cho thuê bất động sản uy tín hàng đầu.</li>
+      <li class="mb-2">✔ Đội ngũ tư vấn & hỗ trợ nhiệt tình, chuyên nghiệp.</li>
+      <li class="mb-2">✔ Đa dạng mặt hàng trên các quận tại TP.HCM.</li>
+    </ul>
+    <div class="text-center">
+      <a href="{% url 'product' %}" class="btn btn-green rounded-pill px-4">
+        Xem Tất Cả Sản Phẩm →
+      </a>
+    </div>
+  </div>
+</div>
+
+
+    {% else %}
+      <p class="text-center text-muted">Chưa có video nào.</p>
+    {% endif %}
+  </div>
+</section>
+
+
+{% endblock banner_slider %}
+
+{% block main-content %}
+<!-- ========== Sản phẩm nổi bật ========== -->
+<div class="product-grid">
+  <div class="container">
+    <h4 class="mt-5 mb-2 fw-bold text-center text-gradient-red-black">🌟 Sản phẩm nổi bật</h4>
+    <p class="text-center text-secondary mb-3">Những sản phẩm được yêu thích và chọn lọc dành riêng cho bạn</p>
+    <div class="divider-gradient-red-black mx-auto mb-4"></div>
+
+    <div class="row g-4 justify-content-center">
+      {% for product in products|slice:":4" %}
+      <div class="col-6 col-sm-6 col-md-4 col-lg-3 d-flex">
+        <div class="card w-100 product-card-uniform rounded-4">
+          {% if product.discount_percent %}
+          <div class="ribbon">-{{ product.discount_percent }}%</div>
+          {% endif %}
+          <a href="{% url 'product_detail' product.id %}">
+            <div class="product-img-wrap">
+              {% if product.image %}
+              <img src="{{ product.image.url }}" alt="{{ product.name }}">
+              {% else %}
+              <img src="{% static 'app/images/placeholder.png' %}" alt="no-img">
+              {% endif %}
+            </div>
+          </a>
+          <div class="card-body text-center">
+            <h6 class="fw-bold mb-1">{{ product.name }}</h6>
+            <p class="text-muted small mb-2">{{ product.location|default:"Chưa rõ vị trí" }}</p>
+            {% if product.discount_percent %}
+              <p class="mb-0 text-muted text-decoration-line-through small">{{ product.price|currency_vn }}</p>
+              <p class="mb-0 text-danger fw-bold">{{ product.gia_giam|currency_vn }}</p>
+            {% else %}
+              <p class="mb-0 text-success fw-bold">{{ product.price|currency_vn }}</p>
+            {% endif %}
+          </div>
+          <div class="card-footer bg-white text-center">
+            <a href="{% url 'product_detail' product.id %}" class="btn btn-green btn-sm rounded-pill px-3">Xem chi tiết</a>
+          </div>
+        </div>
+      </div>
+      {% empty %}
+      <p class="text-center text-muted">Chưa có sản phẩm nào.</p>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+<!-- ========== Sản phẩm bán chạy ========== -->
+<div class="product-grid mt-5">
+  <div class="container">
+    <h4 class="mt-5 mb-2 fw-bold text-center text-gradient-red-black">🔥 Sản phẩm bán chạy</h4>
+    <p class="text-center text-secondary mb-3">Những sản phẩm được nhiều khách hàng tin tưởng và lựa chọn</p>
+    <div class="divider-gradient-red-black mx-auto mb-4"></div>
+
+    <div class="row g-4 justify-content-center">
+      {% for product in popular_products|slice:":4" %}
+      <div class="col-6 col-sm-6 col-md-4 col-lg-3 d-flex">
+        <div class="card w-100 product-card-uniform rounded-4">
+          {% if product.discount_percent %}
+          <div class="ribbon">-{{ product.discount_percent }}%</div>
+          {% endif %}
+          <a href="{% url 'product_detail' product.id %}">
+            <div class="product-img-wrap">
+              {% if product.image %}
+              <img src="{{ product.image.url }}" alt="{{ product.name }}">
+              {% else %}
+              <img src="{% static 'app/images/placeholder.png' %}" alt="no-img">
+              {% endif %}
+            </div>
+          </a>
+          <div class="card-body text-center">
+            <h6 class="fw-bold mb-1">{{ product.name }}</h6>
+            <p class="text-muted small mb-2">{{ product.location|default:"Chưa rõ vị trí" }}</p>
+            {% if product.discount_percent %}
+              <p class="mb-0 text-muted text-decoration-line-through small">{{ product.price|currency_vn }}</p>
+              <p class="mb-0 text-danger fw-bold">{{ product.gia_giam|currency_vn }}</p>
+            {% else %}
+              <p class="mb-0 text-success fw-bold">{{ product.price|currency_vn }}</p>
+            {% endif %}
+          </div>
+          <div class="card-footer bg-white text-center">
+            <a href="{% url 'product_detail' product.id %}" class="btn btn-green btn-sm rounded-pill px-3">Xem chi tiết</a>
+          </div>
+        </div>
+      </div>
+      {% empty %}
+      <p class="text-center text-muted">Chưa có sản phẩm bán chạy nào.</p>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+
+<!-- ========== Sản phẩm khuyến mãi ========== -->
+<div class="product-grid mt-5">
+  <div class="container">
+    <h4 class="mt-5 mb-2 fw-bold text-center text-gradient-orange-red">🎁 Sản phẩm khuyến mãi</h4>
+    <p class="text-center text-secondary mb-3">Những sản phẩm đang giảm giá hấp dẫn, đừng bỏ lỡ!</p>
+    <div class="divider-gradient-orange-red mx-auto mb-4"></div>
+
+    <div class="row g-4 justify-content-center">
+      {% for product in sale_products|slice:":4" %}
+      <div class="col-6 col-sm-6 col-md-4 col-lg-3 d-flex">
+        <div class="card w-100 product-card-uniform rounded-4">
+          {% if product.discount_percent %}
+          <div class="ribbon">-{{ product.discount_percent }}%</div>
+          {% endif %}
+          <a href="{% url 'product_detail' product.id %}">
+            <div class="product-img-wrap">
+              {% if product.image %}
+              <img src="{{ product.image.url }}" alt="{{ product.name }}">
+              {% else %}
+              <img src="{% static 'app/images/placeholder.png' %}" alt="no-img">
+              {% endif %}
+            </div>
+          </a>
+          <div class="card-body text-center">
+            <h6 class="fw-bold mb-1">{{ product.name }}</h6>
+            <p class="text-muted small mb-2">{{ product.location|default:"Chưa rõ vị trí" }}</p>
+            {% if product.discount_percent %}
+              <p class="mb-0 text-muted text-decoration-line-through small">{{ product.price|currency_vn }}</p>
+              <p class="mb-0 text-danger fw-bold">{{ product.gia_giam|currency_vn }}</p>
+            {% else %}
+              <p class="mb-0 text-success fw-bold">{{ product.price|currency_vn }}</p>
+            {% endif %}
+          </div>
+          <div class="card-footer bg-white text-center">
+            <a href="{% url 'product_detail' product.id %}" class="btn btn-green btn-sm rounded-pill px-3">Xem chi tiết</a>
+          </div>
+        </div>
+      </div>
+      {% empty %}
+      <p class="text-center text-muted">Hiện chưa có sản phẩm khuyến mãi nào.</p>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+
+<div class="spacer-footer"></div>
+
+<style>
+/* Product card uniform */
+.product-card-uniform { position: relative; border: 1px solid #eee; transition: .3s; }
+.product-card-uniform:hover { transform: translateY(-6px); box-shadow:0 6px 18px rgba(0,0,0,0.08); }
+.product-img-wrap { height:180px; display:flex; align-items:center; justify-content:center; overflow:hidden; background:#fff; }
+.product-img-wrap img { width:100%; height:100%; object-fit:cover; transition:.3s; }
+.product-card-uniform:hover img { transform:scale(1.05); }
+
+/* Wishlist */
+.btn-wish { position:absolute; top:10px; left:10px; z-index:10; width:36px; height:36px; border-radius:50%; display:flex; align-items:center; justify-content:center; background:#fff; border:1px solid #ddd; }
+.btn-wish i { color:#e63946; }
+
+/* Ribbon */
+.ribbon { position:absolute; top:10px; right:10px; background:#e63946; color:#fff; font-size:12px; padding:4px 6px; border-radius:6px; font-weight:bold; }
+</style>
+
+
+
+<style>
+  
+  .carousel-img {
+  max-height: 500px;
+  object-fit: cover;
+}
+
+/* Caption sát mép dưới ảnh */
+.carousel .caption-bottom-center {
+  position: absolute;
+  left: 50%;
+  bottom: 0.5rem; /* giảm khoảng cách để dính sát mép dưới */
+  transform: translateX(-50%);
+  background: rgba(255, 255, 255, 0.88);
+  backdrop-filter: blur(10px);
+  border-radius: 14px 14px 0 0; /* bo tròn trên, dính dưới ảnh */
+  width: 380px;
+  min-height: 90px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  color: #222;
+  box-shadow: 0 -2px 15px rgba(0, 0, 0, 0.1);
+  animation: fadeInUp 1s ease both;
+  padding: 0.7rem 1rem;
+}
+
+/* Chữ bên trong caption */
+.carousel .caption-bottom-center h5 {
+  font-size: 1.1rem;
+  font-weight: 700;
+  margin: 0 0 0.25rem 0;
+}
+.carousel .caption-bottom-center p {
+  font-size: 0.9rem;
+  margin: 0;
+  color: #333;
+}
+
+/* Hiệu ứng xuất hiện */
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translate(-50%, 15px); }
+  to { opacity: 1; transform: translate(-50%, 0); }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .carousel .caption-bottom-center {
+    width: 90%;
+    bottom: 0.3rem;
+    padding: 0.5rem 0.8rem;
+  }
+}
+
+
+/* CSS Variables */
+:root {
+  --primary-green: #20c997;
+  --primary-dark: #0f172a;
+  --gradient-red-black: linear-gradient(90deg, #e63946, #000000);
+  --gradient-orange-red: linear-gradient(90deg, #ff7e5f, #e63946);
+}
+
+/* General Styles */
+body {
+    font-family: 'Montserrat', sans-serif;
+}
+.text-green { color: var(--primary-green) !important; }
+.btn-green { background-color: var(--primary-green); border-color: var(--primary-green); color: white; transition: 0.3s; }
+.btn-green:hover { background-color: #198754; border-color: #198754; transform: scale(1.05); }
+
+/* Text Gradients */
+.text-gradient-red-black {
+  font-size: 28px;
+  line-height: 1.4;
+  background: var(--gradient-red-black);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.text-gradient-orange-red {
+  font-size: 28px;
+  line-height: 1.4;
+  background: var(--gradient-orange-red);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* Dividers */
+.divider-gradient-red-black {
+  width: 60px;
+  height: 3px;
+  border-radius: 2px;
+  background: var(--gradient-red-black);
+}
+
+.divider-gradient-orange-red {
+  width: 60px;
+  height: 3px;
+  border-radius: 2px;
+  background: var(--gradient-orange-red);
+}
+
+/* Banner */
+.carousel-img { max-height: 480px; object-fit: cover; filter: brightness(1); }
+.caption-elegant { background: rgba(255,255,255,0.85); backdrop-filter: blur(6px); padding: 1rem 1.5rem; border-radius: 1rem; color: #000; }
+.caption-elegant h5 { font-weight: 700; font-size: clamp(1.4rem, 3.2vw, 2.2rem); }
+.caption-elegant p { font-size: clamp(.95rem, 2vw, 1.15rem); margin: 0; }
+
+/* Feature row */
+.feature-row { 
+  background: linear-gradient(90deg, #f6fffa 0%, #f0f9ff 100%); 
+  border-top: 1px solid rgba(14,163,122,0.06); 
+}
+.feature-item {
+  background: linear-gradient(180deg, rgba(255,255,255,0.95), rgba(255,255,255,0.92));
+  transition: transform .36s cubic-bezier(.2,.9,.3,1), box-shadow .36s;
+  padding: 18px;
+  min-height: 130px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+  text-align: center;
+  border: 1px solid rgba(14,163,122,0.06);
+}
+.feature-item:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 10px 30px rgba(14,163,122,0.06);
+}
+.feature-icon {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 10px;
+}
+.feature-item h6 { font-size: 1rem; }
+.feature-item p { margin-bottom: 0; color: #6c757d; font-size: .9rem; }
+.feature-item {
+  opacity: 0;
+  transform: translateY(18px);
+  will-change: transform, opacity;
+}
+.feature-item.in-view {
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity 600ms cubic-bezier(.2,.9,.3,1), transform 600ms cubic-bezier(.2,.9,.3,1);
+}
+
+/* Video section */
+.video-section {
+  background: linear-gradient(90deg, #f9f9f9 0%, #fdfdfd 100%);
+  border-top: 1px solid rgba(0,0,0,0.05);
+}
+
+/* Product card styles */
+.product-card-elegant { 
+  transition: transform .3s, box-shadow .3s; 
+  border: 1px solid #e9ecef; 
+  box-shadow: 0 4px 15px rgba(0,0,0,0.05); 
+}
+.product-card-elegant:hover { 
+  transform: translateY(-8px); 
+  box-shadow: 0 10px 30px rgba(0,0,0,0.1); 
+}
+.product-img-elegant { 
+  object-fit: cover; 
+  height: 200px; 
+  transition: transform .4s; 
+}
+.product-card-elegant:hover .product-img-elegant { 
+  transform: scale(1.03); 
+}
+.update-cart, .update-wishlist { 
+  transition: all .3s ease; 
+}
+.update-cart.added { 
+  background-color: #198754 !important; 
+  color: #fff !important; 
+  border-color: #198754 !important; 
+  pointer-events: none; 
+}
+.update-wishlist.added { 
+  background-color: #e63946 !important; 
+  color: #fff !important; 
+  border-color: #e63946 !important; 
+}
+.spacer-footer { height: 60px; }
+
+/* Responsive tweaks */
+@media (max-width: 576px) {
+  .product-img-elegant { height: 160px; }
+  .feature-icon { width: 56px; height: 56px; }
+  .feature-item { min-height: 110px; }
+  .feature-item p { font-size: .82rem; }
+}
+</style>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    // IntersectionObserver để bật animation fade-in cho feature-item
+    const obsOptions = { root: null, rootMargin: "0px", threshold: 0.12 };
+    const observer = new IntersectionObserver((entries, obs) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('in-view');
+                obs.unobserve(entry.target); // chỉ animate 1 lần
+            }
+        });
+    }, obsOptions);
+
+    document.querySelectorAll('.feature-item').forEach(el => observer.observe(el));
+
+    // helper getCookie
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== "") {
+            const cookies = document.cookie.split(";");
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + "=")) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+
+    function updateCartBadge(val){
+        const el1 = document.getElementById('cart-total-count');
+        const el2 = document.getElementById('cart-count');
+        if(el1) el1.textContent = val;
+        if(el2) el2.textContent = val;
+    }
+    function updateWishlistBadge(val){
+        const el1 = document.getElementById('wishlist-total-count');
+        const el2 = document.getElementById('wishlist-count');
+        if(el1) el1.textContent = val;
+        if(el2) el2.textContent = val;
+    }
+
+    // Add to cart
+    document.querySelectorAll(".update-cart").forEach(btn => {
+        btn.addEventListener("click", function (e) {
+            e.preventDefault();
+            const productId = this.dataset.product;
+            const action = this.dataset.action || 'add';
+            const self = this;
+            self.classList.add("added");
+            self.disabled = true;
+
+            fetch("{% url 'update_item' %}", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-CSRFToken": getCookie("csrftoken"),
+                },
+                body: JSON.stringify({ productId: productId, action: action }),
+            })
+            .then(res => res.json())
+            .then(data => {
+                if(data.error){
+                    console.error("Update cart error:", data.error);
+                    if(typeof showToast === 'function') showToast(data.error, true);
+                } else {
+                    updateCartBadge(data.total_quantity || 0);
+                }
+            })
+            .catch(err => console.error("Error updating cart:", err))
+            .finally(() => {
+                setTimeout(() => { self.classList.remove("added"); self.disabled = false; }, 1000);
+            });
+        });
+    });
+
+    // Wishlist toggle
+    document.querySelectorAll(".update-wishlist").forEach(btn => {
+        btn.addEventListener("click", function (e) {
+            e.preventDefault();
+            const productId = this.dataset.product;
+            const self = this;
+            fetch("{% url 'toggle_wishlist' %}", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-CSRFToken": getCookie("csrftoken"),
+                },
+                body: JSON.stringify({ product_id: productId }),
+            })
+            .then(res => res.json())
+            .then(data => {
+                if(data.error){
+                    console.error("Wishlist error:", data.error);
+                    if(typeof showToast === 'function') showToast(data.error, true);
+                    return;
+                }
+                if(data.status === "added"){
+                    self.classList.add("added");
+                } else {
+                    self.classList.remove("added");
+                }
+                updateWishlistBadge(data.wishlist_count || 0);
+            })
+            .catch(err => console.error("Error toggling wishlist:", err));
+        });
+    });
+});
+</script>
+{% endblock main-content %}

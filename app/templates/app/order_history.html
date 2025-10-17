@@ -1,0 +1,63 @@
+{% extends 'app/base.html' %}
+{% load humanize %}
+{% load custom_filters %}
+
+{% block content %}
+<div class="container my-5">
+  <div class="card shadow-lg border-0 rounded-4">
+    <div class="card-body p-4">
+      <h3 class="mb-4 fw-bold text-center text-success">📜 Lịch sử mua hàng</h3>
+
+      {% if orders %}
+      <div class="table-responsive">
+        <table class="table table-hover text-center align-middle border rounded-3 shadow-sm">
+          <thead style="background-color: #cdded7ff; color: #000; border-radius: 8px;">
+            <tr>
+              <th>Mã đơn</th>
+              <th>Ngày đặt</th>
+              <th>Sản phẩm</th>
+              <th>Tổng tiền</th>
+              <th>Trạng thái</th>
+              <th>Hành động</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for order in orders %}
+            <tr>
+              <td>#{{ order.id }}</td>
+              <td>{{ order.date_order|date:"d/m/Y H:i" }}</td>
+              <td class="text-start">
+                {% for oi in order.orderitem_set.all %}
+                  <div class="mb-1">
+                    <span class="fw-semibold">{{ oi.product.name }}</span> × {{ oi.quantity }}
+                    <span class="text-primary">({{ oi.product.gia_giam|currency_vn }})</span>
+                    = <span class="fw-bold text-success">{{ oi.thanh_tien|currency_vn }}</span>
+                  </div>
+                {% endfor %}
+              </td>
+              <td class="fw-bold text-success">{{ order.tong_tien|currency_vn }}</td>
+              <td>
+                {% if order.complete %}
+                  <span class="badge bg-success">Hoàn tất</span>
+                {% else %}
+                  <span class="badge bg-warning text-dark">Đang xử lý</span>
+                {% endif %}
+              </td>
+              <td>
+                <form method="post" action="{% url 'delete_order' order.id %}" onsubmit="return confirm('Bạn chắc chắn muốn xoá đơn #{{ order.id }}?');">
+                  {% csrf_token %}
+                  <button type="submit" class="btn btn-sm btn-outline-danger">🗑 Xóa</button>
+                </form>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      {% else %}
+        <p class="text-center text-muted fs-5">Bạn chưa có đơn hàng nào </p>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}

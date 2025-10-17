@@ -1,0 +1,118 @@
+{% extends "app/base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="d-flex align-items-center justify-content-center min-vh-100 px-3" style="background: var(--bg);">
+  <div class="bg-white dark:bg-gray-800 p-5 p-md-6 rounded-3 shadow-lg w-100" style="max-width: 500px; transition: background 0.3s, color 0.3s;">
+    <h2 class="text-center mb-4 text-dark dark:text-white fw-bold">Đăng ký tài khoản</h2>
+
+    <!-- Hiển thị lỗi form tổng quát -->
+    {% if form.non_field_errors %}
+      <div class="alert alert-danger py-2">
+        <ul class="mb-0">
+          {% for error in form.non_field_errors %}
+            <li>{{ error }}</li>
+          {% endfor %}
+        </ul>
+      </div>
+    {% endif %}
+
+    <form method="post" class="mb-3" novalidate>
+      {% csrf_token %}
+
+      <!-- Username -->
+      <div class="mb-3">
+        <label for="{{ form.username.id_for_label }}" class="form-label text-dark dark:text-white">Tên đăng nhập</label>
+        {{ form.username }}
+        {% if form.username.errors %}
+          <div class="text-danger small">
+            {% for error in form.username.errors %}{{ error }}{% endfor %}
+          </div>
+        {% endif %}
+      </div>
+
+      <!-- Email -->
+      <div class="mb-3">
+        <label for="{{ form.email.id_for_label }}" class="form-label text-dark dark:text-white">Email</label>
+        {{ form.email }}
+        {% if form.email.errors %}
+          <div class="text-danger small">
+            {% for error in form.email.errors %}{{ error }}{% endfor %}
+          </div>
+        {% endif %}
+      </div>
+
+      <!-- Phone -->
+      <div class="mb-3">
+        <label for="{{ form.phone.id_for_label }}" class="form-label text-dark dark:text-white">Số điện thoại</label>
+        {{ form.phone }}
+        {% if form.phone.errors %}
+          <div class="text-danger small">
+            {% for error in form.phone.errors %}{{ error }}{% endfor %}
+          </div>
+        {% endif %}
+      </div>
+
+      <!-- Password -->
+      <div class="mb-3">
+        <label for="{{ form.password1.id_for_label }}" class="form-label text-dark dark:text-white">Mật khẩu</label>
+        {{ form.password1 }}
+        {% if form.password1.errors %}
+          <div class="text-danger small">
+            {% for error in form.password1.errors %}{{ error }}{% endfor %}
+          </div>
+        {% endif %}
+      </div>
+
+      <!-- Confirm Password -->
+      <div class="mb-3">
+        <label for="{{ form.password2.id_for_label }}" class="form-label text-dark dark:text-white">Xác nhận mật khẩu</label>
+        {{ form.password2 }}
+        {% if form.password2.errors %}
+          <div class="text-danger small">
+            {% for error in form.password2.errors %}{{ error }}{% endfor %}
+          </div>
+        {% endif %}
+      </div>
+
+      <button type="submit" class="btn btn-success w-100">Đăng ký</button>
+    </form>
+
+    <p class="text-center text-muted dark:text-gray-300 mb-0">
+      Đã có tài khoản? 
+      <a href="{% url 'login' %}" class="text-primary dark:text-info">Đăng nhập</a>
+    </p>
+  </div>
+</div>
+
+<style>
+/* Style input Django render */
+input, select, textarea {
+  width: 100%;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid #ccc;
+  border-radius: 0.375rem;
+  background-color: var(--bs-body-bg);
+  color: inherit;
+}
+
+/* Focus effect */
+input:focus, textarea:focus {
+  border-color: #198754 !important;
+  box-shadow: 0 0 0 0.2rem rgba(25,135,84,.25) !important;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+/* Hover button */
+button:hover {
+  opacity: 0.9;
+  transition: opacity 0.2s;
+}
+
+/* Lỗi hiển thị đẹp */
+.text-danger.small {
+  margin-top: 4px;
+}
+</style>
+{% endblock %}

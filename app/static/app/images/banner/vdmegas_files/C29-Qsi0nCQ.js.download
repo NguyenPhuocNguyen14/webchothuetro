@@ -1,0 +1,4 @@
+;/*FB_PKG_DELIM*/
+
+__d("GroupsCometPendingPostsBulkDeclineDialogQuery_facebookRelayOperation",[],(function(a,b,c,d,e,f){e.exports="24830149859910621"}),null);
+__d("MAWEncryptedBackupsClearRecoveryCode",["Promise","ReQL"],(function(a,b,c,d,e,f,g){"use strict";var h;function a(a){return(h||(h=b("Promise"))).all([d("ReQL").firstAsync(d("ReQL").fromTableAscending(a.tables.secure_recovery_code_data)),d("ReQL").firstAsync(d("ReQL").fromTableAscending(a.tables.secure_encrypted_backups_recovery_code_status))]).then(function(c){var d=c[0],e=c[1];if(d!=null||e!=null)return a.runInTransaction(function(a){return(h||(h=b("Promise"))).all([(d==null?void 0:d.taskId)!=null?a.secure_recovery_code_data["delete"](d.taskId):(h||(h=b("Promise"))).resolve(),(e==null?void 0:e.pk)!=null?a.secure_encrypted_backups_recovery_code_status["delete"](e.pk):(h||(h=b("Promise"))).resolve()])},"readwrite",void 0,void 0,f.id+":27")})}g.encryptedBackupsClearRecoveryCode=a}),98);

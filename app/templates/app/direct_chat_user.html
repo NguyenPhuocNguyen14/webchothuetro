@@ -1,0 +1,118 @@
+{% extends "app/base.html" %}
+{% block content %}
+<div class="container mt-5">
+  <h3 class="mb-3 text-center">💬 Chat với Admin</h3>
+
+  <!-- Hộp chat -->
+  <div id="chat-box"
+       style="height:400px; overflow-y:auto; border:1px solid #ccc;
+              border-radius:10px; padding:10px; background:#f0f2f5;">
+    <!-- Tin nhắn load bằng JS -->
+  </div>
+
+  <!-- Form gửi tin nhắn + ảnh -->
+  <form id="chat-form" enctype="multipart/form-data" style="margin-top:15px;">
+    {% csrf_token %}
+    <div style="display:flex; gap:10px; align-items:center;">
+      <input type="text" id="message-input" name="message" class="form-control"
+             placeholder="Nhập tin nhắn..." style="flex:1;">
+      <input type="file" id="image-input" name="image" accept="image/*" class="form-control" style="max-width:200px;">
+      <button type="submit" class="btn btn-success">Gửi</button>
+    </div>
+  </form>
+</div>
+
+<script>
+  const chatBox = document.getElementById("chat-box");
+  const chatForm = document.getElementById("chat-form");
+  const messageInput = document.getElementById("message-input");
+  const imageInput = document.getElementById("image-input");
+
+  // ✅ Lấy token CSRF
+  function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== "") {
+      const cookies = document.cookie.split(";");
+      for (let i = 0; i < cookies.length; i++) {
+        const cookie = cookies[i].trim();
+        if (cookie.substring(0, name.length + 1) === (name + "=")) {
+          cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+          break;
+        }
+      }
+    }
+    return cookieValue;
+  }
+  const csrftoken = getCookie("csrftoken");
+
+  // ✅ Format thời gian đẹp
+  function formatDate(dateStr) {
+    const d = new Date(dateStr);
+    if (isNaN(d)) return "";
+    const h = String(d.getHours()).padStart(2, "0");
+    const m = String(d.getMinutes()).padStart(2, "0");
+    const day = String(d.getDate()).padStart(2, "0");
+    const month = String(d.getMonth() + 1).padStart(2, "0");
+    const year = d.getFullYear();
+    return `${h}:${m} ${day}/${month}/${year}`;
+  }
+
+  // ✅ Load tin nhắn
+  function loadMessages() {
+    fetch("{% url 'get_direct_messages' %}")
+      .then(res => res.json())
+      .then(data => {
+        chatBox.innerHTML = "";
+        data.forEach(msg => {
+          const div = document.createElement("div");
+          div.style.margin = "8px 0";
+          div.style.textAlign = msg.sender === "user" ? "right" : "left";
+
+          let content = "";
+          if (msg.message) {
+            content += `<div>${msg.message}</div>`;
+          }
+          if (msg.image) {
+            content += `<div style="margin-top:5px;"><img src="${msg.image}" style="max-width:200px; border-radius:8px;"></div>`;
+          }
+
+          div.innerHTML = `
+            <div style="display:inline-block; padding:8px 12px; border-radius:12px;
+                         background:${msg.sender === "user" ? "#0084ff" : "#eee"};
+                         color:${msg.sender === "user" ? "#fff" : "#333"};
+                         max-width:70%; word-wrap:break-word;">
+              ${content}
+            </div>
+            <div style="font-size:11px; color:#888; margin-top:2px;">
+              ${formatDate(msg.created_at)}
+            </div>
+          `;
+          chatBox.appendChild(div);
+        });
+        chatBox.scrollTop = chatBox.scrollHeight;
+      });
+  }
+
+  // ✅ Gửi tin nhắn
+  chatForm.addEventListener("submit", function(e) {
+    e.preventDefault();
+    if (!messageInput.value && !imageInput.files.length) {
+      return; // không gửi tin nhắn trống
+    }
+    const formData = new FormData(chatForm);
+    fetch("{% url 'send_direct_message' %}", {
+      method: "POST",
+      headers: { "X-CSRFToken": csrftoken }, // 👈 cần header này
+      body: formData
+    }).then(() => {
+      messageInput.value = "";
+      imageInput.value = "";
+      loadMessages();
+    });
+  });
+
+  // ✅ Tự động load mỗi 3 giây
+  setInterval(loadMessages, 3000);
+  loadMessages();
+</script>
+{% endblock %}

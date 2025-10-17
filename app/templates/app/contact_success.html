@@ -1,0 +1,8 @@
+{% extends "app/base.html" %}
+{% block content %}
+<div class="container py-5 text-center">
+  <h2 class="text-success fw-bold">✅ Gửi liên hệ thành công!</h2>
+  <p>Cảm ơn <b>{{ name }}</b> đã liên hệ với chúng tôi. Chúng tôi sẽ phản hồi sớm nhất có thể 💌</p>
+  <a href="{% url 'home' %}" class="btn btn-primary mt-3">⬅ Về trang chủ</a>
+</div>
+{% endblock %}
