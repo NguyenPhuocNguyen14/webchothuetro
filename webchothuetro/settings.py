@@ -11,12 +11,15 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # Load file .env
 load_dotenv(BASE_DIR / ".env")
 
-# ==========================
-# Django Settings
-# ==========================
-SECRET_KEY = 'django-insecure-...'
-DEBUG = True
-ALLOWED_HOSTS = []
+
+
+CSRF_TRUSTED_ORIGINS = os.getenv(
+    "CSRF_TRUSTED_ORIGINS",
+    "https://c0mqr6fv-8000.asse.devtunnels.ms,http://127.0.0.1:8000,http://localhost:8000"
+).split(",")
+CSRF_COOKIE_SECURE = False
+SESSION_COOKIE_SECURE = False
+
 
 INSTALLED_APPS = [
     # mặc định
@@ -39,6 +42,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware', 
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -84,12 +88,41 @@ CHANNEL_LAYERS = {
 # ==========================
 # Database
 # ==========================
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+# -------------------------
+# Env / Secret
+# -------------------------
+SECRET_KEY = os.getenv("SECRET_KEY", "django-insecure-fallback-for-dev-only")
+DEBUG = os.getenv("DEBUG", "True").lower() in ("1", "true", "yes")
+
+# ALLOWED_HOSTS from env (comma separated)
+allowed = os.getenv("ALLOWED_HOSTS", "127.0.0.1,localhost").split(",")
+ALLOWED_HOSTS = [h.strip() for h in allowed if h.strip()]
+
+# -------------------------
+# Database via DATABASE_URL
+# -------------------------
+import dj_database_url
+
+DATABASE_URL = os.getenv("DATABASE_URL")
+if DATABASE_URL:
+    # If you're deploying to Railway/Heroku, enable ssl_require=True in production
+    DATABASES = {
+        "default": dj_database_url.parse(DATABASE_URL, conn_max_age=600, ssl_require=not DEBUG)
     }
-}
+else:
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.postgresql",
+            "NAME": os.getenv("PG_NAME", "webchothuetro"),
+            "USER": os.getenv("PG_USER", "postgres"),
+            "PASSWORD": os.getenv("PG_PASSWORD", "0123456"),
+            "HOST": os.getenv("PG_HOST", "localhost"),
+            "PORT": os.getenv("PG_PORT", "5432"),
+        }
+    }
+
+
+
 
 # ==========================
 # Auth
@@ -104,7 +137,7 @@ LOGIN_URL = '/login/'
 LANGUAGE_CODE = 'vi'
 TIME_ZONE = 'Asia/Ho_Chi_Minh'
 USE_I18N = True
-USE_TZ = True
+USE_TZ = False
 USE_L10N = True
 
 # ==========================
@@ -120,9 +153,7 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # ==========================
-# CSRF
-# ==========================
-CSRF_TRUSTED_ORIGINS = ['http://127.0.0.1:8000', 'http://localhost:8000']
+
 
 # ==========================
 # API Keys
@@ -155,3 +186,4 @@ CONTACT_EMAIL = "admin@gmail.com"
 
 
 
+STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"

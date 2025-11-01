@@ -103,13 +103,14 @@
   <ul class="list-unstyled">
     <li><strong>Tên:</strong> {{ product.name }}</li>
     <li><strong>Giá:</strong> 
-      {% if product.discount_percent > 0 %}
-        <span class="text-success">{{ product.gia_giam|intcomma }} VNĐ</span>
-        <del class="text-muted small ms-2">{{ product.price|intcomma }} VNĐ</del>
-      {% else %}
-        {{ product.price|intcomma }} VNĐ
-      {% endif %}
-    </li>
+  {% if product.discount_percent > 0 %}
+    <span class="text-success">{{ product.gia_giam|currency_vn }}</span>
+    <del class="text-muted small ms-2">{{ product.price|currency_vn }}</del>
+  {% else %}
+    {{ product.price|currency_vn }}
+  {% endif %}
+</li>
+
 
     <li><strong>Địa chỉ:</strong> {{ product.location|default:"Không có địa chỉ" }}</li>
 
