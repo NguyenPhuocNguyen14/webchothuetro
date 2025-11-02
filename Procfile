@@ -1,3 +1,4 @@
-web: gunicorn webchothuetro.wsgi --log-file -
+
+web: python manage.py collectstatic --noinput && gunicorn webchothuetro.wsgi --bind 0.0.0.0:$PORT
 
 
