@@ -13,6 +13,9 @@ load_dotenv(BASE_DIR / ".env")
 
 
 
+DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
+
+
 CSRF_TRUSTED_ORIGINS = os.getenv(
     "CSRF_TRUSTED_ORIGINS",
     "https://webchothuetro-production.up.railway.app"
@@ -32,6 +35,8 @@ INSTALLED_APPS = [
 
     # channels
     "channels",
+    "cloudinary",
+    "cloudinary_storage",
 
     # app humanize
     'django.contrib.humanize',
