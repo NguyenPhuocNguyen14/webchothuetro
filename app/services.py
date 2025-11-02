@@ -80,7 +80,7 @@ def ask_with_products(user_msg, request=None):  # ⚡ nhận thêm request
         """
     else:
         context = f"""
-        Bạn là nhân viên tư vấn cho dịch vụ phòng trọ "The Fern House".
+        Bạn là nhân viên tư vấn cho dịch vụ phòng trọ "The Tiller House".
         Người dùng hỏi: {user_msg}
 
         Không tìm thấy phòng trọ hoặc sản phẩm phù hợp trong kho.
