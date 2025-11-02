@@ -4,7 +4,11 @@ from django.db.models import Sum
 from django.db import models
 from django.utils import timezone
 
-
+def _is_url(val: str) -> bool:
+    if not val:
+        return False
+    s = str(val)
+    return s.startswith("http") or "res.cloudinary.com" in s
 # ====================
 # Khách hàng
 # ====================
@@ -41,15 +45,15 @@ class Product(models.Model):
     category = models.CharField("Loại", max_length=20, choices=CATEGORY_CHOICES, default="shop")
     location = models.CharField("Địa chỉ", max_length=300, null=True, blank=True)
     DISTRICT_CHOICES = [
-    ("Tân Phú", "Tân Phú"),
-    ("Bình Tân", "Bình Tân"),
-    ("Tân Bình", "Tân Bình"),
-    ("Gò Vấp", "Gò Vấp"),
-    ("Quận 1", "Quận 1"),
-    ("Quận 3", "Quận 3"),
-    ("Phú Nhuận", "Phú Nhuận"),
-    ("Bình Thạnh", "Bình Thạnh"),
-]
+        ("Tân Phú", "Tân Phú"),
+        ("Bình Tân", "Bình Tân"),
+        ("Tân Bình", "Tân Bình"),
+        ("Gò Vấp", "Gò Vấp"),
+        ("Quận 1", "Quận 1"),
+        ("Quận 3", "Quận 3"),
+        ("Phú Nhuận", "Phú Nhuận"),
+        ("Bình Thạnh", "Bình Thạnh"),
+    ]
 
     district = models.CharField("Quận", max_length=100, choices=DISTRICT_CHOICES, default="Tân Phú")
 
@@ -84,14 +88,40 @@ class Product(models.Model):
         return f"{self.price:,.0f} VNĐ" if self.price else "Liên hệ"
 
     @property
+    def image_url(self):
+        """
+        Trả về URL an toàn cho ảnh chính:
+        - nếu trường image là full URL -> trả thẳng
+        - nếu là FieldFile local -> trả image.url (Django sẽ resolve nếu file tồn)
+        - nếu rơi vào lỗi thì trả None
+        """
+        if not self.image:
+            return None
+        s = str(self.image)
+        if _is_url(s):
+            # đôi khi DB lưu "media/https%3A/..." đã được fixed rồi, nhưng check nhanh
+            if "%3A" in s:
+                from urllib.parse import unquote
+                s = unquote(s)
+                s = s.replace('/media/', '').replace('media/', '')
+            return s
+        try:
+            return self.image.url
+        except Exception:
+            return s
+
+    @property
     def get_all_images(self):
-        """Lấy cả ảnh chính + ảnh phụ"""
+        """Lấy list các URL ảnh (ảnh chính + ảnh phụ) dạng string"""
         images = []
         if self.image:
-            images.append(self.image)
+            url = self.image_url
+            if url:
+                images.append(url)
         for img in self.images.all():
-            if img.image:
-                images.append(img.image)
+            u = getattr(img, "image_url", None)
+            if u:
+                images.append(u)
         return images
 
 
@@ -106,6 +136,21 @@ class ProductImage(models.Model):
     def __str__(self):
         return f"Ảnh phụ của {self.product.name}"
 
+    @property
+    def image_url(self):
+        if not self.image:
+            return None
+        s = str(self.image)
+        if _is_url(s):
+            if "%3A" in s:
+                from urllib.parse import unquote
+                s = unquote(s).replace('/media/', '').replace('media/', '')
+            return s
+        try:
+            return self.image.url
+        except Exception:
+            return s
+
 
 class ProductVideo(models.Model):
     product = models.ForeignKey(Product, related_name="videos", on_delete=models.CASCADE)
@@ -118,6 +163,17 @@ class ProductVideo(models.Model):
     def __str__(self):
         return f"Video của {self.product.name}"
 
+    @property
+    def video_url(self):
+        if not self.video:
+            return None
+        s = str(self.video)
+        if _is_url(s):
+            return s
+        try:
+            return self.video.url
+        except Exception:
+            return s
 
 # ====================
 # Đơn hàng
