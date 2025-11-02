@@ -5,8 +5,9 @@
             {% for product in products %}
                 <div class="col-6 col-md-4 col-lg-3 d-flex">
                     <div class="card w-100 shadow-sm border-0 rounded-4 overflow-hidden product-card-elegant">
-                        {% if product.image %}
-                            <img src="{{ product.image.url }}" class="card-img-top product-img-elegant" alt="{{ product.name }}">
+                        
+                        {% if product.image_url %}
+                            <img src="{{ product.image_url }}" class="card-img-top product-img-elegant" alt="{{ product.name }}">
                         {% else %}
                             <img src="{% static 'app/images/placeholder.png' %}" class="card-img-top product-img-elegant" alt="{{ product.name }}">
                         {% endif %}
