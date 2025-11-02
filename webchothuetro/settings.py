@@ -15,11 +15,11 @@ load_dotenv(BASE_DIR / ".env")
 
 CSRF_TRUSTED_ORIGINS = os.getenv(
     "CSRF_TRUSTED_ORIGINS",
-    "https://c0mqr6fv-8000.asse.devtunnels.ms,http://127.0.0.1:8000,http://localhost:8000"
+    "https://webchothuetro-production.up.railway.app"
 ).split(",")
-CSRF_COOKIE_SECURE = False
-SESSION_COOKIE_SECURE = False
-
+CSRF_COOKIE_SECURE = True
+SESSION_COOKIE_SECURE = True
+CSRF_TRUSTED_ORIGINS = [x.strip() for x in CSRF_TRUSTED_ORIGINS if x.strip()]
 
 INSTALLED_APPS = [
     # mặc định
