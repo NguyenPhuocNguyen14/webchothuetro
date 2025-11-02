@@ -46,11 +46,14 @@
             {% for item in cart_products %}
             <tr data-product-id="{{ item.product.id }}">
               <td>
-                {% if item.product.image %}
-                  <img src="{{ item.product.image.url }}" class="img-fluid rounded shadow-sm" style="max-height:60px;" alt="{{ item.product.name }}">
-                {% else %}
-                  <img src="{% static 'app/images/no-image.png' %}" class="img-fluid rounded shadow-sm" style="max-height:60px;" alt="No image">
-                {% endif %}
+               {% with img=product.image_url %}
+  {% if img %}
+    <img src="{{ img }}" class="img-fluid rounded shadow-sm" style="max-height:60px;" alt="{{ product.name }}">
+  {% else %}
+    <img src="{% static 'app/images/no-image.png' %}" class="img-fluid rounded shadow-sm" style="max-height:60px;" alt="No image">
+  {% endif %}
+{% endwith %}
+
               </td>
               <td class="fw-semibold">
                 {{ item.product.name }} <br>

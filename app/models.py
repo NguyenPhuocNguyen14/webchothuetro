@@ -3,6 +3,16 @@ from django.contrib.auth.models import User
 from django.db.models import Sum
 from django.db import models
 from django.utils import timezone
+import re
+from urllib.parse import unquote
+
+# helper nhỏ
+def _is_url(s: str) -> bool:
+    """Simple URL check (http/https)."""
+    if not s:
+        return False
+    s = str(s).strip()
+    return bool(re.match(r'^(https?:)?//', s)) or s.startswith('http://') or s.startswith('https://')
 
 def _is_url(val: str) -> bool:
     if not val:
@@ -91,37 +101,52 @@ class Product(models.Model):
     def image_url(self):
         """
         Trả về URL an toàn cho ảnh chính:
-        - nếu trường image là full URL -> trả thẳng
-        - nếu là FieldFile local -> trả image.url (Django sẽ resolve nếu file tồn)
-        - nếu rơi vào lỗi thì trả None
+        - Nếu field lưu trực tiếp URL string -> trả thẳng
+        - Nếu là FieldFile (ImageField) -> trả image.url (nếu có)
+        - Nếu DB lưu dạng encode 'media/https%3A/...' -> decode
         """
         if not self.image:
             return None
+
         s = str(self.image)
+
+        # fix trường hợp lưu dạng media/https%3A/...
+        if "%3A" in s or s.startswith("media/https") or s.startswith("/media/https"):
+            s = unquote(s)
+            s = s.replace('/media/', '').replace('media/', '')
+
+        # nếu đã là URL -> trả luôn
         if _is_url(s):
-            # đôi khi DB lưu "media/https%3A/..." đã được fixed rồi, nhưng check nhanh
-            if "%3A" in s:
-                from urllib.parse import unquote
-                s = unquote(s)
-                s = s.replace('/media/', '').replace('media/', '')
+            # ensure scheme present (some values may start with //)
+            if s.startswith("//"):
+                return "https:" + s
             return s
+
+        # else try to use Django storage .url (works for Cloudinary storage or local)
         try:
             return self.image.url
         except Exception:
-            return s
+            return None
+
 
     @property
     def get_all_images(self):
-        """Lấy list các URL ảnh (ảnh chính + ảnh phụ) dạng string"""
+        """
+        Trả về list các URL (string) gồm ảnh chính + ảnh phụ.
+        Luôn trả list các string hoặc [].
+        """
         images = []
-        if self.image:
-            url = self.image_url
-            if url:
-                images.append(url)
+        main = self.image_url
+        if main:
+            images.append(main)
         for img in self.images.all():
-            u = getattr(img, "image_url", None)
-            if u:
-                images.append(u)
+            try:
+                # ProductImage có property image_url (xem dưới)
+                u = getattr(img, "image_url", None)
+                if u:
+                    images.append(u)
+            except Exception:
+                continue
         return images
 
 
@@ -129,51 +154,43 @@ class ProductImage(models.Model):
     product = models.ForeignKey(Product, related_name="images", on_delete=models.CASCADE)
     image = models.ImageField(upload_to="products/", verbose_name="Ảnh phụ")
 
-    class Meta:
-        verbose_name = "Ảnh sản phẩm"
-        verbose_name_plural = "Danh sách ảnh sản phẩm"
-
-    def __str__(self):
-        return f"Ảnh phụ của {self.product.name}"
-
     @property
     def image_url(self):
         if not self.image:
             return None
         s = str(self.image)
+        if "%3A" in s or s.startswith("media/https") or s.startswith("/media/https"):
+            s = unquote(s).replace('/media/', '').replace('media/', '')
         if _is_url(s):
-            if "%3A" in s:
-                from urllib.parse import unquote
-                s = unquote(s).replace('/media/', '').replace('media/', '')
+            if s.startswith("//"):
+                return "https:" + s
             return s
         try:
             return self.image.url
         except Exception:
-            return s
+            return None
 
 
+# ProductVideo
 class ProductVideo(models.Model):
     product = models.ForeignKey(Product, related_name="videos", on_delete=models.CASCADE)
     video = models.FileField(upload_to="products/videos/", verbose_name="Video sản phẩm")
-
-    class Meta:
-        verbose_name = "Video sản phẩm"
-        verbose_name_plural = "Danh sách video sản phẩm"
-
-    def __str__(self):
-        return f"Video của {self.product.name}"
 
     @property
     def video_url(self):
         if not self.video:
             return None
         s = str(self.video)
+        if "%3A" in s or s.startswith("media/https") or s.startswith("/media/https"):
+            s = unquote(s).replace('/media/', '').replace('media/', '')
         if _is_url(s):
+            if s.startswith("//"):
+                return "https:" + s
             return s
         try:
             return self.video.url
         except Exception:
-            return s
+            return None
 
 # ====================
 # Đơn hàng
