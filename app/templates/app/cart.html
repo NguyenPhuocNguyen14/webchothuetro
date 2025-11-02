@@ -46,12 +46,15 @@
             {% for item in cart_products %}
             <tr data-product-id="{{ item.product.id }}">
               <td>
-                {% if item.product.image %}
-                  <img src="{{ item.product.image.url }}" class="img-fluid rounded shadow-sm" style="max-height:60px;" alt="{{ item.product.name }}">
-                {% else %}
-                  <img src="{% static 'app/images/no-image.png' %}" class="img-fluid rounded shadow-sm" style="max-height:60px;" alt="No image">
-                {% endif %}
-              </td>
+  <img
+    src="{{ item.product.image_url|default:static('app/images/no-image.png') }}"
+    class="img-fluid rounded shadow-sm"
+    style="max-height:60px;"
+    alt="{{ item.product.name }}"
+    loading="lazy"
+  >
+</td>
+
               <td class="fw-semibold">
                 {{ item.product.name }} <br>
                 <small class="text-muted">ID: {{ item.product.id }}</small>
@@ -90,12 +93,11 @@
 <div class="card shadow-lg border-0 rounded-4 mt-4">
   <div class="card-body p-4">
     <div class="d-flex justify-content-between align-items-center mb-4">
-  <h3 class="fw-bold text-success mb-0">📜 Lịch sử mua hàng</h3>
-  <a href="{% url 'order_history' %}" class="btn btn-outline-primary fw-semibold rounded-pill px-4">
-    Xem tất cả →
-  </a>
-</div>
-
+      <h3 class="fw-bold text-success mb-0">📜 Lịch sử mua hàng</h3>
+      <a href="{% url 'order_history' %}" class="btn btn-outline-primary fw-semibold rounded-pill px-4">
+        Xem tất cả →
+      </a>
+    </div>
 
     {% if past_orders %}
     <div class="table-responsive">
@@ -116,14 +118,20 @@
             <td>{{ order.date_order|date:"d/m/Y H:i" }}</td>
             <td class="text-start">
               {% for oi in order.orderitem_set.all %}
-                <div class="mb-1">
-                  <span class="fw-semibold">{{ oi.product.name }}</span> × {{ oi.quantity }}
-                  <span class="text-primary">({{ oi.product.gia_giam|currency_vn }})</span>
-                  = <span class="fw-bold text-success">{{ oi.thanh_tien|currency_vn }}</span>
+                <div class="mb-2 d-flex align-items-center gap-2">
+                  <img src="{{ oi.product.image_url|default:static('app/images/no-image.png') }}" 
+                       alt="{{ oi.product.name }}" 
+                       class="rounded shadow-sm"
+                       style="width:50px; height:50px; object-fit:cover;">
+                  <div>
+                    <span class="fw-semibold">{{ oi.product.name }}</span> × {{ oi.quantity }}<br>
+                    <span class="text-primary">({{ oi.product.gia_giam|currency_vn }})</span>
+                    = <span class="fw-bold text-success">{{ oi.thanh_tien|currency_vn }}</span>
+                  </div>
                 </div>
               {% endfor %}
             </td>
-            <td class="fw-bold text-success">{{ order.get_cart_total|currency_vn }}</td>
+            <td class="fw-bold text-success">{{ order.tong_tien|currency_vn }}</td>
             <td>
               {% if order.complete %}
                 <span class="badge bg-success">Hoàn tất</span>
@@ -137,10 +145,11 @@
       </table>
     </div>
     {% else %}
-      <p class="text-center text-muted fs-5">Bạn chưa có đơn hàng nào </p>
+      <p class="text-center text-muted fs-5">Bạn chưa có đơn hàng nào</p>
     {% endif %}
   </div>
 </div>
+
 
 
 
