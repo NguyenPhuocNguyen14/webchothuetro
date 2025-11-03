@@ -127,24 +127,33 @@ class Product(models.Model):
             return self.image.url
         except Exception:
             return None
-
-
+        
     @property
-def get_all_images(self):
-    """
-    Lấy list các URL ảnh (ảnh chính + ảnh phụ) dạng string.
-    Bỏ qua link /media/... nếu không tồn tại hoặc không phải URL hợp lệ.
-    """
-    images = []
-    if self.image_url:
-        images.append(self.image_url)
+    def get_all_images(self):
+        """
+        Lấy list các URL ảnh (ảnh chính + ảnh phụ) dạng string.
+        Bỏ qua các đường dẫn local bắt đầu bằng '/media/' nếu không hợp lệ.
+        """
+        images = []
 
-    for img in self.images.all():
-        u = getattr(img, "image_url", None)
-        # chỉ thêm nếu URL thật sự là Cloudinary hoặc link http(s)
-        if u and (u.startswith("http") or u.startswith("https")):
-            images.append(u)
-    return images
+        # ảnh chính (product.image_url đã xử lý trong property image_url)
+        try:
+            if self.image_url:
+                if str(self.image_url).startswith("http"):
+                    images.append(self.image_url)
+        except Exception:
+            pass
+
+        # ảnh phụ
+        for img in self.images.all():
+            u = getattr(img, "image_url", None)
+            if not u:
+                continue
+            s = str(u).strip()
+            if s.startswith("http://") or s.startswith("https://"):
+                images.append(s)
+
+        return images
 
 
 class ProductImage(models.Model):
