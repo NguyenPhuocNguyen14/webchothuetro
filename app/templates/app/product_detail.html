@@ -11,7 +11,7 @@
   <div class="col-md-6">
     <div class="shadow-sm rounded-4 overflow-hidden mb-3 text-center product-image-wrapper">
       {% if product.get_all_images %}
-        <img id="mainImage" src="{{ product.get_all_images.0 }}" 
+        <img id="mainImage" src="{{ product.get_all_images.0.url }}" 
              class="w-100 product-detail-img" 
              alt="{{ product.name }}">
       {% else %}
@@ -22,7 +22,7 @@
     </div>
   </div>
 
-  <!-- Thông tin sản phẩm -->
+      <!-- Thông tin sản phẩm -->
   <div class="col-md-6 d-flex flex-column justify-content-center product-info-wrapper">
     <h2 class="fw-bold mb-2">{{ product.name }}</h2>
     <div class="d-flex align-items-center gap-2 mb-2">
@@ -52,25 +52,21 @@
 </div>
       
 
-<!-- Thumbnail & Video -->
+<!-- Thumbnail & Video (nằm riêng, dưới ảnh chính, nhưng vẫn trong col-md-6) -->
 <div class="row mt-3">
   <div class="col-md-6 d-flex gap-2 flex-wrap justify-content-center align-items-center">
     {% for img in product.get_all_images %}
-      {% if img %}
-        <img src="{{ img }}" 
-             class="thumb-img {% if forloop.first %}active{% endif %}" 
-             alt="thumb-{{ forloop.counter }}">
-      {% endif %}
+      <img src="{{ img.url }}" 
+           class="thumb-img {% if forloop.first %}active{% endif %}" 
+           alt="thumb-{{ forloop.counter }}">
     {% endfor %}
 
     {% for v in product.videos.all %}
-      {% if v.video_url %}
       <video muted 
              class="thumb-img thumb-video-preview" 
-             onclick="showVideo('{{ v.video_url }}')">
-        <source src="{{ v.video_url }}" type="video/mp4">
+             onclick="showVideo('{{ v.video.url }}')">
+        <source src="{{ v.video.url }}" type="video/mp4">
       </video>
-      {% endif %}
     {% endfor %}
   </div>
 </div>
@@ -115,7 +111,9 @@
   {% endif %}
 </li>
 
+
     <li><strong>Địa chỉ:</strong> {{ product.location|default:"Không có địa chỉ" }}</li>
+
     <li><strong>Quận:</strong>
       {% if product.district %}
         {{ product.get_district_display }}
@@ -123,6 +121,7 @@
         Không rõ
       {% endif %}
     </li>
+
     <li><strong>ID sản phẩm:</strong> #{{ product.id }}</li>
     <li><strong>Loại:</strong> {{ product.get_category_display }}</li>
 
@@ -137,16 +136,18 @@
     <div class="tab-pane fade" id="review">
       <h6 class="fw-bold mb-3">Bình luận</h6>
 
+      <!-- Danh sách comment -->
       <div id="comment-list" class="mb-4">
         {% for c in product.comments.all %}
           <div class="border rounded p-3 mb-2">
             {% if c.name %}
-              <strong>{{ c.name }}</strong>
-            {% elif c.user %}
-              <strong>{{ c.user.name }}</strong>
-            {% else %}
-              <strong>Khách</strong>
-            {% endif %}
+  <strong>{{ c.name }}</strong>
+{% elif c.user %}
+  <strong>{{ c.user.name }}</strong>
+{% else %}
+  <strong>Khách</strong>
+{% endif %}
+
             <span class="text-muted small">{{ c.created_at|naturaltime }}</span>
             <p class="mb-0">{{ c.content }}</p>
           </div>
@@ -155,6 +156,7 @@
         {% endfor %}
       </div>
 
+      <!-- Form thêm comment -->
       {% if request.user.is_authenticated %}
       <form id="comment-form">
         {% csrf_token %}
@@ -180,8 +182,8 @@
         <a href="{% url 'product_detail' p.id %}" class="text-decoration-none">
           <div class="card h-100 shadow-sm product-card-elegant border-0 rounded-4 overflow-hidden">
             
-            {% if p.image_url %}
-              <img src="{{ p.image_url }}" class="card-img-top product-img-elegant" alt="{{ p.name }}">
+            {% if p.image %}
+              <img src="{{ p.image.url }}" class="card-img-top product-img-elegant" alt="{{ p.name }}">
             {% else %}
               <img src="{% static 'app/images/placeholder.png' %}" class="card-img-top product-img-elegant" alt="{{ p.name }}">
             {% endif %}
@@ -205,6 +207,7 @@
   </div>
 </div>
 
+
 <style>
   .product-detail-img { max-height: 500px; object-fit: contain; transition: transform 0.3s ease; cursor: zoom-in; }
   .product-detail-img.zoomed { transform: scale(1.1); }
@@ -219,27 +222,45 @@
   body.dark .nav-tabs .nav-link.active { background-color: #198754; color: #fff; }
   .product-image-wrapper, .product-info-wrapper { cursor: default; }
   .product-card-elegant {
-    transition: transform 0.25s ease, box-shadow 0.25s ease;
-    background-color: #fff;
-  }
-  .product-card-elegant:hover {
-    transform: translateY(-6px);
-    box-shadow: 0 8px 24px rgba(0,0,0,0.08);
-  }
-  .product-img-elegant {
-    height: 180px;
-    object-fit: cover;
-  }
-  .product-card-elegant .text-success {
-    color: #0f5132 !important;
-  }
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+  background-color: #fff;
+}
+.product-card-elegant:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+}
+.product-img-elegant {
+  height: 180px;
+  object-fit: cover;
+}
+.product-card-elegant .text-success {
+  color: #0f5132 !important;
+}
+
 </style>
 
 <script>
 document.addEventListener("DOMContentLoaded", () => {
-  const csrftoken = '{{ csrf_token }}';
+  // lấy csrf token từ cookie (ổn định hơn)
+  function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== "") {
+      const cookies = document.cookie.split(";");
+      for (let i = 0; i < cookies.length; i++) {
+        const cookie = cookies[i].trim();
+        if (cookie.substring(0, name.length + 1) === (name + "=")) {
+          cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+          break;
+        }
+      }
+    }
+    return cookieValue;
+  }
+
+  const csrftoken = getCookie("csrftoken");
   const mainImg = document.getElementById("mainImage");
 
+  // Thumbnail click
   document.querySelectorAll(".thumb-img").forEach(img => {
     img.addEventListener("click", e => {
       e.preventDefault();
@@ -250,18 +271,157 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
+  // Main image zoom
   let zoomTimeout = null;
-  mainImg.addEventListener("click", e => {
-    e.preventDefault();
-    e.stopPropagation();
-    mainImg.classList.add("zoomed");
-    clearTimeout(zoomTimeout);
-    zoomTimeout = setTimeout(() => mainImg.classList.remove("zoomed"), 300);
-  });
-});
+  if (mainImg) {
+    mainImg.addEventListener("click", e => {
+      e.preventDefault();
+      e.stopPropagation();
+      mainImg.classList.add("zoomed");
+      clearTimeout(zoomTimeout);
+      zoomTimeout = setTimeout(() => mainImg.classList.remove("zoomed"), 300);
+    });
+  }
 
-function showVideo(videoUrl){
+  // Helper: cập nhật badge/cart UI
+  function updateCartUI(data) {
+    const cartCount = document.getElementById("cart-total-count");
+    const cartCountSmall = document.getElementById("cart-count");
+    const totalPriceEl = document.getElementById("cart-total-price");
+    if (cartCount) cartCount.textContent = data.total_quantity ?? data.total_quantity;
+    if (cartCountSmall) cartCountSmall.textContent = data.total_quantity ?? data.total_quantity;
+    if (totalPriceEl && typeof data.total_price !== "undefined") {
+      totalPriceEl.textContent = new Intl.NumberFormat('vi-VN').format(data.total_price) + " VNĐ";
+    }
+  }
+
+  // Generic fetch handler for update_item
+  async function postUpdateItem(productId, action) {
+    try {
+      const res = await fetch("{% url 'update_item' %}", {
+        method: "POST",
+        credentials: "same-origin",
+        headers: {
+          "Content-Type": "application/json",
+          "X-CSRFToken": csrftoken,
+          "Accept": "application/json"
+        },
+        body: JSON.stringify({ productId: productId, action: action })
+      });
+
+      // 401/403 -> not auth or CSRF problem -> redirect to login
+      if (res.status === 401 || res.status === 403) {
+        // add next param so user returns to product page
+        window.location.href = "{% url 'login' %}?next={{ request.path }}";
+        return null;
+      }
+
+      // Try parse as JSON; if fails, probably returned HTML (login page) -> redirect
+      const text = await res.text();
+      try {
+        const data = JSON.parse(text);
+        return data;
+      } catch (err) {
+        // not JSON => redirect to login
+        window.location.href = "{% url 'login' %}?next={{ request.path }}";
+        return null;
+      }
+    } catch (err) {
+      console.error("Network error:", err);
+      alert("Có lỗi mạng khi cập nhật giỏ hàng. Thử lại nhé.");
+      return null;
+    }
+  }
+
+  // Add to cart buttons
+  document.querySelectorAll(".btn-add").forEach(btn => {
+    btn.addEventListener("click", async (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+
+      const productId = btn.dataset.product;
+      const action = btn.dataset.action || "add";
+
+      // UX: disable + spinner
+      btn.disabled = true;
+      const originalHTML = btn.innerHTML;
+      btn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Đang thêm...';
+
+      const data = await postUpdateItem(productId, action);
+
+      if (data) {
+        // success path
+        updateCartUI(data);
+
+        // feedback nhỏ
+        btn.innerHTML = '✓ Đã thêm';
+        btn.classList.remove("btn-outline-success");
+        btn.classList.add("btn-success", "added");
+
+        setTimeout(() => {
+          btn.disabled = false;
+          btn.innerHTML = originalHTML;
+          btn.classList.remove("btn-success", "added");
+          btn.classList.add("btn-outline-success");
+        }, 1200);
+      } else {
+        // nếu null nghĩa đã redirect hoặc lỗi đã xử lý
+        btn.disabled = false;
+        btn.innerHTML = originalHTML;
+      }
+    });
+  });
+
+
+  // AJAX submit comment (giữ nguyên logic, nhưng dùng cookie CSRF)
+  const commentForm = document.getElementById("comment-form");
+  if (commentForm) {
+    commentForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const contentEl = document.getElementById("comment-content");
+      const content = contentEl.value.trim();
+      if (!content) return;
+
+      try {
+        const res = await fetch("{% url 'add_comment' product.id %}", {
+          method: "POST",
+          credentials: "same-origin",
+          headers: {
+            "Content-Type": "application/json",
+            "X-CSRFToken": csrftoken,
+            "Accept": "application/json"
+          },
+          body: JSON.stringify({ content })
+        });
+
+        if (res.status === 401 || res.status === 403) {
+          window.location.href = "{% url 'login' %}?next={{ request.path }}";
+          return;
+        }
+
+        const data = await res.json();
+        if (data.success) {
+          const commentList = document.getElementById("comment-list");
+          const newComment = document.createElement("div");
+          newComment.className = "border rounded p-3 mb-2";
+          newComment.innerHTML = `<strong>${data.user}</strong> <span class="text-muted small">vừa xong</span><p class="mb-0">${data.content}</p>`;
+          commentList.prepend(newComment);
+          contentEl.value = "";
+        } else {
+          alert(data.error || "Đã có lỗi khi gửi bình luận.");
+        }
+      } catch (err) {
+        console.error(err);
+        alert("Có lỗi khi gửi bình luận.");
+      }
+    });
+  }
+}); // DOMContentLoaded end
+
+// Function showVideo cần ở global scope
+function showVideo(videoUrl) {
   const wrapper = document.querySelector(".product-image-wrapper");
+  if (!wrapper) return;
   wrapper.innerHTML = `
     <video controls autoplay class="w-100 product-detail-img rounded-4">
       <source src="${videoUrl}" type="video/mp4">
@@ -270,4 +430,5 @@ function showVideo(videoUrl){
   `;
 }
 </script>
+
 {% endblock main-content %}

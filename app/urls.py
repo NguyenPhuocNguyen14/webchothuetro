@@ -57,6 +57,7 @@ urlpatterns = [
 
    # Chat trực tiếp User ↔ Admin
 path("direct-chat/", views.direct_chat_user, name="direct_chat"),   # user chat
+
 path("direct-chat-admin/", views.direct_chat_admin, name="direct_chat_admin"),  # admin chat
 path("chat/send/", views.send_direct_message, name="send_direct_message"),
 path("chat/get/", views.get_direct_messages, name="get_direct_messages"),

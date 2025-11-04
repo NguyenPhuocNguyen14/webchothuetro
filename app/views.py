@@ -378,9 +378,22 @@ def get_or_create_customer(user):
     return user.customer
 
 
-@login_required
+from django.http import JsonResponse
+from django.views.decorators.http import require_POST
+from django.db import transaction
+from django.shortcuts import get_object_or_404
+
 @require_POST
 def update_item(request):
+    """
+    API cập nhật giỏ hàng (POST JSON):
+    - Trả 401 nếu user chưa authenticate (frontend sẽ redirect về login)
+    - Trả JSON mô tả tổng số lượng + tổng giá
+    """
+    # nếu chưa login -> trả 401 (frontend redirect)
+    if not request.user.is_authenticated:
+        return JsonResponse({"error": "not_authenticated"}, status=401)
+
     try:
         data = json.loads(request.body)
     except json.JSONDecodeError:
@@ -393,7 +406,7 @@ def update_item(request):
         return JsonResponse({"error": "Missing productId or action"}, status=400)
 
     product = get_object_or_404(Product, id=product_id)
-    customer = get_or_create_customer(request.user)  # ✅ fix an toàn
+    customer = get_or_create_customer(request.user)
     order, _ = Order.objects.get_or_create(customer=customer, complete=False)
 
     with transaction.atomic():
@@ -407,7 +420,14 @@ def update_item(request):
             order_item.quantity -= 1
         elif action == "delete":
             order_item.delete()
-            return JsonResponse({"status": "deleted"})
+            total_quantity = sum(i.quantity for i in order.orderitem_set.all())
+            total_price = sum(i.thanh_tien for i in order.orderitem_set.all())
+            return JsonResponse({
+                "status": "deleted",
+                "product_id": product.id,
+                "total_quantity": total_quantity,
+                "total_price": total_price,
+            })
         else:
             return JsonResponse({"error": "Unknown action"}, status=400)
 
@@ -416,17 +436,17 @@ def update_item(request):
         else:
             order_item.save()
 
-    # Tính toán lại tổng giỏ hàng
     total_quantity = sum(i.quantity for i in order.orderitem_set.all())
     total_price = sum(i.thanh_tien for i in order.orderitem_set.all())
 
     return JsonResponse({
-        "quantity": order_item.quantity if order_item.id else 0,
-        "item_total": order_item.thanh_tien if order_item.id else 0,
+        "status": "ok",
+        "product_id": product.id,
+        "quantity": getattr(order_item, "quantity", 0),
+        "item_total": getattr(order_item, "thanh_tien", 0),
         "total_quantity": total_quantity,
         "total_price": total_price,
     })
-
 
 
 

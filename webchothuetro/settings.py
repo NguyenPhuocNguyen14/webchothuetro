@@ -1,81 +1,105 @@
+# settings.py — cleaned & fixed (replace the top/middle parts accordingly)
+
 from pathlib import Path
 import os
 from dotenv import load_dotenv
-import google.generativeai as genai   # import 1 lần thôi
+# optional: google generative ai (only if you actually use it elsewhere)
+try:
+    import google.generativeai as genai
+except Exception:
+    genai = None
 
 # ==========================
 # Base / Env
 # ==========================
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# Load file .env
+# Load file .env (if exists)
 load_dotenv(BASE_DIR / ".env")
 
+# Secret + Debug
+SECRET_KEY = os.getenv("SECRET_KEY", "django-insecure-fallback-for-dev-only")
+DEBUG = os.getenv("DEBUG", "True").lower() in ("1", "true", "yes")
 
+# --------------------------
+# Hosts & CSRF / Cookies
+# --------------------------
+# Default safe hosts (add your production host(s) here or via ENV ALLOWED_HOSTS)
+default_allowed = os.getenv("ALLOWED_HOSTS", "127.0.0.1,localhost,webchothuetro-production.up.railway.app")
+ALLOWED_HOSTS = [h.strip() for h in default_allowed.split(",") if h.strip()]
 
-DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
+# CSRF trusted origins logic: local (http) vs production (https)
+if DEBUG:
+    CSRF_TRUSTED_ORIGINS = ["http://127.0.0.1:8000", "http://localhost:8000"]
+    CSRF_COOKIE_SECURE = False
+    SESSION_COOKIE_SECURE = False
+else:
+    # If you have multiple production domains, set as comma separated in env var CSRF_TRUSTED_ORIGINS
+    env_csrf = os.getenv("CSRF_TRUSTED_ORIGINS")
+    if env_csrf:
+        CSRF_TRUSTED_ORIGINS = [x.strip() for x in env_csrf.split(",") if x.strip()]
+    else:
+        CSRF_TRUSTED_ORIGINS = ["https://webchothuetro-production.up.railway.app"]
+    CSRF_COOKIE_SECURE = True
+    SESSION_COOKIE_SECURE = True
 
+# ==========================
+# Cloudinary (media storage)
+# ==========================
+CLOUDINARY_CLOUD_NAME = os.environ.get("CLOUDINARY_CLOUD_NAME") or os.getenv("CLOUDINARY_CLOUD_NAME")
+CLOUDINARY_API_KEY = os.environ.get("CLOUDINARY_API_KEY") or os.getenv("CLOUDINARY_API_KEY")
+CLOUDINARY_API_SECRET = os.environ.get("CLOUDINARY_API_SECRET") or os.getenv("CLOUDINARY_API_SECRET")
 
-CSRF_TRUSTED_ORIGINS = os.getenv(
-    "CSRF_TRUSTED_ORIGINS",
-    "https://webchothuetro-production.up.railway.app"
-).split(",")
-CSRF_COOKIE_SECURE = True
-SESSION_COOKIE_SECURE = True
-CSRF_TRUSTED_ORIGINS = [x.strip() for x in CSRF_TRUSTED_ORIGINS if x.strip()]
-
-import os
-
-# Lấy thông tin từ Biến Môi Trường trên Railway
-CLOUDINARY_CLOUD_NAME = os.environ.get('CLOUDINARY_CLOUD_NAME')
-CLOUDINARY_API_KEY = os.environ.get('CLOUDINARY_API_KEY')
-CLOUDINARY_API_SECRET = os.environ.get('CLOUDINARY_API_SECRET')
-
-# Cấu hình chính thức
 CLOUDINARY_STORAGE = {
-    'CLOUD_NAME': CLOUDINARY_CLOUD_NAME,
-    'API_KEY': CLOUDINARY_API_KEY,
-    'API_SECRET': CLOUDINARY_API_SECRET
+    "CLOUD_NAME": CLOUDINARY_CLOUD_NAME,
+    "API_KEY": CLOUDINARY_API_KEY,
+    "API_SECRET": CLOUDINARY_API_SECRET,
 }
 
-# Đặt Cloudinary làm nơi lưu trữ mặc định cho TỆP MEDIA (ảnh tải lên)
-DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
+# If cloudinary credentials are present, use Cloudinary for media files.
+# Otherwise fallback to local MEDIA (useful for dev).
+if CLOUDINARY_CLOUD_NAME and CLOUDINARY_API_KEY and CLOUDINARY_API_SECRET:
+    DEFAULT_FILE_STORAGE = "cloudinary_storage.storage.MediaCloudinaryStorage"
+else:
+    DEFAULT_FILE_STORAGE = "django.core.files.storage.FileSystemStorage"
 
+# ==========================
+# Installed apps & middleware
+# ==========================
 INSTALLED_APPS = [
-    # mặc định
-    'django.contrib.admin',
-    'django.contrib.auth',
-    'django.contrib.contenttypes',
-    'django.contrib.sessions',
-    'django.contrib.messages',
-    'django.contrib.staticfiles',
+    # django defaults
+    "django.contrib.admin",
+    "django.contrib.auth",
+    "django.contrib.contenttypes",
+    "django.contrib.sessions",
+    "django.contrib.messages",
+    "django.contrib.staticfiles",
 
-    # channels
+    # channels & cloudinary (only needed if installed)
     "channels",
-    "cloudinary",
-    "cloudinary_storage",
+    "cloudinary" if CLOUDINARY_CLOUD_NAME else None,
+    "cloudinary_storage" if CLOUDINARY_CLOUD_NAME else None,
 
-    # app humanize
-    'django.contrib.humanize',
-
-    # app của bạn
-    'app',
+    # humanize & your app
+    "django.contrib.humanize",
+    "app",
 ]
 
-
+# remove None entries if cloudinary not configured
+INSTALLED_APPS = [a for a in INSTALLED_APPS if a]
 
 MIDDLEWARE = [
-    'django.middleware.security.SecurityMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware', 
-    'django.contrib.sessions.middleware.SessionMiddleware',
-    'django.middleware.common.CommonMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
-    'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'django.contrib.messages.middleware.MessageMiddleware',
-    'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    "django.middleware.security.SecurityMiddleware",
+    "whitenoise.middleware.WhiteNoiseMiddleware",
+    "django.contrib.sessions.middleware.SessionMiddleware",
+    "django.middleware.common.CommonMiddleware",
+    "django.middleware.csrf.CsrfViewMiddleware",
+    "django.contrib.auth.middleware.AuthenticationMiddleware",
+    "django.contrib.messages.middleware.MessageMiddleware",
+    "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
 
-ROOT_URLCONF = 'webchothuetro.urls'
+ROOT_URLCONF = "webchothuetro.urls"
 
 TEMPLATES = [
     {
@@ -94,11 +118,11 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'webchothuetro.wsgi.application'
+WSGI_APPLICATION = "webchothuetro.wsgi.application"
 ASGI_APPLICATION = "webchothuetro.asgi.application"
 
 # ==========================
-# Channels
+# Channels (local default)
 # ==========================
 CHANNEL_LAYERS = {
     "default": {
@@ -110,26 +134,12 @@ CHANNEL_LAYERS = {
 }
 
 # ==========================
-# Database
+# Database config
 # ==========================
-# -------------------------
-# Env / Secret
-# -------------------------
-SECRET_KEY = os.getenv("SECRET_KEY", "django-insecure-fallback-for-dev-only")
-DEBUG = os.getenv("DEBUG", "True").lower() in ("1", "true", "yes")
-
-# ALLOWED_HOSTS from env (comma separated)
-allowed = os.getenv("ALLOWED_HOSTS", "127.0.0.1,localhost").split(",")
-ALLOWED_HOSTS = [h.strip() for h in allowed if h.strip()]
-
-# -------------------------
-# Database via DATABASE_URL
-# -------------------------
 import dj_database_url
 
 DATABASE_URL = os.getenv("DATABASE_URL")
 if DATABASE_URL:
-    # If you're deploying to Railway/Heroku, enable ssl_require=True in production
     DATABASES = {
         "default": dj_database_url.parse(DATABASE_URL, conn_max_age=600, ssl_require=not DEBUG)
     }
@@ -145,69 +155,62 @@ else:
         }
     }
 
-
-
-
 # ==========================
-# Auth
+# Auth / i18n
 # ==========================
-LOGIN_REDIRECT_URL = '/'
-LOGOUT_REDIRECT_URL = '/'
-LOGIN_URL = '/login/'
+LOGIN_REDIRECT_URL = "/"
+LOGOUT_REDIRECT_URL = "/"
+LOGIN_URL = "/login/"
 
-# ==========================
-# I18N / L10N
-# ==========================
-LANGUAGE_CODE = 'vi'
-TIME_ZONE = 'Asia/Ho_Chi_Minh'
+LANGUAGE_CODE = "vi"
+TIME_ZONE = "Asia/Ho_Chi_Minh"
 USE_I18N = True
 USE_TZ = False
 USE_L10N = True
 
 # ==========================
-# Static / Media
+# Static & Media
 # ==========================
-STATIC_URL = '/static/'
+STATIC_URL = "/static/"
 STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
 STATICFILES_DIRS = [os.path.join(BASE_DIR, "static")]
 
-MEDIA_URL = '/media/'
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+MEDIA_URL = "/media/"
+MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 
-DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+# If using whitenoise for static files
+STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
 # ==========================
-
-
-# ==========================
-# API Keys
+# API keys + Gemini optional
 # ==========================
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY", "sk-...")
-GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "AIzaSyBlwO47z_Fo6tAn6k5yHiX8gp8I0yQsceQ")
+GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "")
 
-
-# ==========================
-# Gemini Config
-# ==========================
-genai.configure(api_key=GEMINI_API_KEY)
+if genai and GEMINI_API_KEY:
+    try:
+        genai.configure(api_key=GEMINI_API_KEY)
+    except Exception:
+        pass
 
 def ask_gemini(prompt):
-    model = genai.GenerativeModel("gemini-1.5-flash")  # free model
+    if genai is None:
+        raise RuntimeError("google.generativeai not installed")
+    model = genai.GenerativeModel("gemini-1.5-flash")
     response = model.generate_content(prompt)
     return response.text
+
 # ==========================
-# Email config
+# Email config (keep or change)
 # ==========================
 EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
 EMAIL_HOST = "smtp.gmail.com"
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
-EMAIL_HOST_USER = "nguyenphuocnguyen7789@gmail.com"
-EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD", "vilqvnpznsfmskjt")  # lấy từ .env, fallback nếu .env trống
+EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER", "nguyenphuocnguyen7789@gmail.com")
+EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD", "")
 
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 CONTACT_EMAIL = "admin@gmail.com"
-
-
-
-STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
