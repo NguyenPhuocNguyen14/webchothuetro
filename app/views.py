@@ -872,10 +872,18 @@ def product_view(request):
 
 
 
-# views.py (thêm cuối file)
+# app/views.py
+import traceback
 from django.http import HttpResponse
 from app.tasks import test_task
 
 def run_task_view(request):
-    test_task.delay(42)
-    return HttpResponse("task queued")
+    try:
+        test_task.delay(99)
+        return HttpResponse("✅ Task sent to Celery worker!")
+    except Exception as e:
+        tb = traceback.format_exc()
+        # log ra stdout (railway capture logs)
+        print("DEBUG RUN-TASK ERROR:", tb)
+        return HttpResponse(f"<pre>{tb}</pre>", status=500)
+
