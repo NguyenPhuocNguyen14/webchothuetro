@@ -3,6 +3,8 @@
 from pathlib import Path
 import os
 from dotenv import load_dotenv
+
+load_dotenv()
 # optional: google generative ai (only if you actually use it elsewhere)
 try:
     import google.generativeai as genai
@@ -16,7 +18,8 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 # Load file .env (if exists)
 load_dotenv(BASE_DIR / ".env")
-
+# fallback là localhost để dev local chạy dễ
+REDIS_URL = os.getenv("REDIS_URL", "redis://127.0.0.1:6379/0")
 # Secret + Debug
 SECRET_KEY = os.getenv("SECRET_KEY", "django-insecure-fallback-for-dev-only")
 DEBUG = os.getenv("DEBUG", "True").lower() in ("1", "true", "yes")
@@ -84,7 +87,16 @@ INSTALLED_APPS = [
     "django.contrib.humanize",
     "app",
 ]
+# Celery settings
 
+CELERY_ACCEPT_CONTENT = ['json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
+CELERY_TIMEZONE = "Asia/Ho_Chi_Minh"
+
+# --- Cấu hình Celery kết nối Redis ---
+CELERY_BROKER_URL = os.getenv('REDIS_URL', 'redis://localhost:6379/0')
+CELERY_RESULT_BACKEND = os.getenv('REDIS_URL', 'redis://localhost:6379/0')
 # remove None entries if cloudinary not configured
 INSTALLED_APPS = [a for a in INSTALLED_APPS if a]
 
@@ -128,7 +140,7 @@ CHANNEL_LAYERS = {
     "default": {
         "BACKEND": "channels_redis.core.RedisChannelLayer",
         "CONFIG": {
-            "hosts": [("127.0.0.1", 6379)],
+            "hosts": [REDIS_URL],
         },
     },
 }
@@ -182,6 +194,7 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 # If using whitenoise for static files
 STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
+
 
 # ==========================
 # API keys + Gemini optional
