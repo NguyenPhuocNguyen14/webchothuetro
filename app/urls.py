@@ -71,4 +71,6 @@ path("contact/", views.contact_view, name="contact"),
      path("orders/delete/<int:order_id>/", views.delete_order, name="delete_order"),
     # Django admin
     path("admin/", admin.site.urls),
+    path('debug/run-task/', views.run_task_view),
+
 ]

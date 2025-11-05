@@ -10,7 +10,7 @@ from django.urls import reverse
 from .models import Contact
 from .forms import SignupForm
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
-
+from .tasks import send_contact_email
 from dotenv import load_dotenv
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import JsonResponse
@@ -777,41 +777,21 @@ def order_success(request, order_id):
 
 
 def contact_view(request):
-    if request.method == "POST":
-        name = (request.POST.get("name") or "").strip()
-        email = (request.POST.get("email") or "").strip()
-        phone = (request.POST.get("phone") or "").strip()
-        message = (request.POST.get("message") or "").strip()
+    if request.method == 'POST':
+        name = request.POST.get('name')
+        email = request.POST.get('email')
+        message = request.POST.get('message')
 
-        if name and email and message:
-            # ✅ Lưu DB
-            Contact.objects.create(
-                name=name, email=email, phone=phone, message=message
-            )
+        subject = f"Liên hệ mới từ {name}"
+        body = f"Tên: {name}\nEmail: {email}\n\nNội dung:\n{message}"
 
-            # ✅ Gửi mail cho admin
-            subject = f"📩 Liên hệ từ {name}"
-            body = (
-                f"Người gửi: {name}\n"
-                f"Email: {email}\n"
-                f"Số điện thoại: {phone or 'Không cung cấp'}\n\n"
-                f"Nội dung:\n{message}"
-            )
-            try:
-                send_mail(
-                    subject,
-                    body,
-                    settings.DEFAULT_FROM_EMAIL,
-                    [settings.CONTACT_EMAIL],
-                    fail_silently=False,
-                )
-                messages.success(request, "✅ Gửi liên hệ thành công! Chúng tôi sẽ phản hồi sớm.")
-            except Exception as e:
-                messages.error(request, f"❌ Lỗi khi gửi mail: {e}")
-        else:
-            messages.error(request, "⚠️ Vui lòng điền đầy đủ thông tin.")
+        # Gửi task lên Celery (thay vì send_mail trực tiếp)
+        send_contact_email.delay(subject, body, "admin@example.com")
 
-    return render(request, "app/contact.html")
+        messages.success(request, "Tin nhắn đã được gửi. Chúng tôi sẽ phản hồi sớm nhất!")
+        return redirect('contact')
+
+    return render(request, 'app/contact.html')
 
 @login_required
 def order_detail(request, order_id):
@@ -889,3 +869,13 @@ def product_view(request):
         "categories": categories,
     }
     return render(request, "app/product.html", context)
+
+
+
+# views.py (thêm cuối file)
+from django.http import HttpResponse
+from app.tasks import test_task
+
+def run_task_view(request):
+    test_task.delay(42)
+    return HttpResponse("task queued")
